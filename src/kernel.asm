@@ -7,6 +7,11 @@
 
 global start
 
+extern GDT_DESC
+
+%define GDT_IDX_DATA_0  10
+%define GDT_IDX_CODE_0  12
+%define GDT_IDX_VIDEO_0 14
 
 BITS 16
 ;; Saltear seccion de datos
@@ -43,17 +48,37 @@ start:
 
 
     ; Habilitar A20
+    call A20_enable
     
     ; Cargar la GDT
+    lgdt [GDT_DESC]
 
     ; Setear el bit PE del registro CR0
+    mov eax, cr0
+    or eax, 1
+    mov cr0, eax
     
     ; Saltar a modo protegido
+    jmp (GDT_IDX_CODE_0<<3):modoprotegido
 
+BITS 32
+modoprotegido:
     ; Establecer selectores de segmentos
+    mov ax, GDT_IDX_DATA_0
+    shl ax, 3
+    mov ss, ax
+    mov ds, ax
+    mov es, ax
+    mov gs, ax
+    mov ax, GDT_IDX_VIDEO_0
+    shl ax, 3
+    mov fs, ax
 
     ; Establecer la base de la pila
+    mov esp, 0x25000
+    mov ebp, esp
     
+    xchg bx, bx
     ; Imprimir mensaje de bienvenida
 
     ; Inicializar pantalla
