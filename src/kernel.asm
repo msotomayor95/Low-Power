@@ -18,6 +18,8 @@ extern GDT_DESC
 %define GDT_IDX_DATA_0  10
 %define GDT_IDX_CODE_0  12
 %define GDT_IDX_VIDEO_0 14
+%define C_BG_BLACK 0
+%define C_BG_GREEN 8192
 
 BITS 16
 ;; Saltear seccion de datos
@@ -89,19 +91,21 @@ modoprotegido:
     ; Inicializar pantalla
     xor edi, edi 
     .filaNegra:
-        mov [fs:edi], C_BG_BLACK
-        inc edi
-        cmp edi, 0x50
+        mov WORD [fs:edi], C_BG_BLACK
+        add edi, 2
+        cmp edi, 0xA0
         jnz .filaNegra
+    xchg bx, bx
     .mapaVerde:
-        mov [fs:edi], C_BG_GREEN
-        inc edi
-        cmp edi, 0xCD0
-        jnz .mapaVerde:
+        mov WORD [fs:edi], C_BG_GREEN
+        add edi, 2
+        cmp edi, 0x19A0
+        jnz .mapaVerde
+    xchg bx, bx
     .tableroNegro:
-        mov [fs:edi], C_BG_BLACK
-        inc edi
-        cmp edi, 0xFA0
+        mov WORD [fs:edi], C_BG_BLACK
+        add edi, 2
+        cmp edi, 0x1F40
         jnz .tableroNegro
     xchg bx, bx
     ; Inicializar el manejador de memoria
