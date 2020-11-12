@@ -41,5 +41,48 @@ idt_descriptor_t IDT_DESC = {sizeof(idt) - 1, (uint32_t)&idt};
 
 void idt_init() {
   // Excepciones
+  IDT_ENTRY(0);
+  IDT_ENTRY(1);
+  IDT_ENTRY(2);
+  IDT_ENTRY(3);
+  IDT_ENTRY(4);
+  IDT_ENTRY(5);
+  IDT_ENTRY(6);
+  IDT_ENTRY(7);
+  IDT_ENTRY(8);
+  IDT_ENTRY(9);
+  IDT_ENTRY(10);
+  IDT_ENTRY(11);
+  IDT_ENTRY(12);
+  IDT_ENTRY(13);
+  IDT_ENTRY(14);
+  IDT_ENTRY(15);
+  IDT_ENTRY(16);
+  IDT_ENTRY(17);
+  IDT_ENTRY(18);
+  IDT_ENTRY(19);
+  IDT_ENTRY(20);
+  IDT_ENTRY(21);
+  IDT_ENTRY(22);
+  IDT_ENTRY(23);
+  IDT_ENTRY(24);
+  IDT_ENTRY(25);
+  IDT_ENTRY(26);
+  IDT_ENTRY(27);
+  IDT_ENTRY(28);
+  IDT_ENTRY(29);
+  IDT_ENTRY(31);
+
+  // Clock
+  idt[32].offset_15_0 = (uint16_t) ((uint32_t)(&_isrClock) & (uint32_t) 0xFFFF);        
+  idt[32].segsel = (uint16_t) (GDT_IDX_CODE_0 << 3);                                         
+  idt[32].attr = (uint16_t) 0x8E00;                                                          
+  idt[32].offset_31_16 = (uint16_t) ((uint32_t)(&_isrClock) >> 16 & (uint32_t) 0xFFFF);
+
+  idt[33].offset_15_0 = (uint16_t) ((uint32_t)(&_isrKey) & (uint32_t) 0xFFFF);        
+  idt[33].segsel = (uint16_t) (GDT_IDX_CODE_0 << 3);                                         
+  idt[33].attr = (uint16_t) 0x8E00;                                                          
+  idt[33].offset_31_16 = (uint16_t) ((uint32_t)(&_isrKey) >> 16 & (uint32_t) 0xFFFF);
+
 }
 
