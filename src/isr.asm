@@ -12,6 +12,8 @@ BITS 32
 sched_task_offset:     dd 0xFFFFFFFF
 sched_task_selector:   dw 0xFFFF
 
+extern print_hex
+
 ;; PIC
 extern pic_finish1
 
@@ -21,6 +23,12 @@ extern sched_next_task
 ;;
 global _isrClock
 global _isrKey
+
+global _isr88
+global _isr89
+global _isr100
+global _isr123
+
 ;;
 ;; Definición de MACROS
 ;; -------------------------------------------------------------------------- ;;
@@ -73,14 +81,50 @@ ISR 31
 ;; -------------------------------------------------------------------------- ;;
 
 _isrClock:
+    call pic_finish1
+    call next_clock
+    iret
 
 ;; Rutina de atención del TECLADO
 ;; -------------------------------------------------------------------------- ;;
 
-_isrKey
+_isrKey:
+    call pic_finish1
+    pushad
+    xor eax, eax
+    in al, 0x60
+    cmp eax, 0x80
+    jge .solte 
+    push 0x0f       ; text blanco en fondo negro
+    push 0
+    push 79
+    push 1
+    push eax
+    call print_hex
+    add esp, 20
+    .solte:
+    popad
+    iret
 
 ;; Rutinas de atención de las SYSCALLS
 ;; -------------------------------------------------------------------------- ;;
+
+_isr88:
+    mov eax, 0x58
+    iret
+
+_isr89:
+    mov eax, 0x59
+    iret
+
+_isr100:
+    mov eax, 0x64
+    iret
+
+_isr123:
+    mov eax, 0x7b
+    iret
+
 ;; Funciones Auxiliares
 ;; -------------------------------------------------------------------------- ;;
 isrNumber:           dd 0x00000000

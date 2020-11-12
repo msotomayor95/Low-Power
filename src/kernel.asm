@@ -7,6 +7,12 @@
 
 global start
 
+extern IDT_DESC
+extern idt_init
+
+extern pic_reset
+extern pic_enable
+
 extern GDT_DESC
 
 %define GDT_IDX_DATA_0  10
@@ -78,7 +84,6 @@ modoprotegido:
     mov esp, 0x25000
     mov ebp, esp
     
-    xchg bx, bx
     ; Imprimir mensaje de bienvenida
 
     ; Inicializar pantalla
@@ -98,14 +103,21 @@ modoprotegido:
     ; Inicializar el scheduler
 
     ; Inicializar la IDT
+
+    call idt_init
     
     ; Cargar IDT
  
+    lidt [IDT_DESC]
     ; Configurar controlador de interrupciones
+
+    call pic_reset
+    call pic_enable
 
     ; Cargar tarea inicial
 
     ; Habilitar interrupciones
+    sti
 
     ; Saltar a la primera tarea: Idle
 

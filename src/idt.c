@@ -28,15 +28,11 @@ idt_descriptor_t IDT_DESC = {sizeof(idt) - 1, (uint32_t)&idt};
     }
 */
 
-/*
 #define IDT_ENTRY(numero) \
-    idt[numero].offset_15_0 = (uint16_t) ((uint32_t)(&_isr ## numero) &
-(uint32_t) 0xFFFF); \
-    idt[numero].segsel = (uint16_t) 0x00; \
-    idt[numero].attr = (uint16_t) 0x0000; \
-    idt[numero].offset_31_16 = (uint16_t) ((uint32_t)(&_isr ## numero) >> 16 &
-(uint32_t) 0xFFFF);
-*/
+    idt[numero].offset_15_0 = (uint16_t) ((uint32_t)(&_isr ## numero) & (uint32_t) 0xFFFF); \
+    idt[numero].segsel = (uint16_t) (GDT_IDX_CODE_0 << 3); \
+    idt[numero].attr = (uint16_t) 0x8E00; \
+    idt[numero].offset_31_16 = (uint16_t) ((uint32_t)(&_isr ## numero) >> 16 & (uint32_t) 0xFFFF);
 
 
 void idt_init() {
@@ -71,6 +67,7 @@ void idt_init() {
   IDT_ENTRY(27);
   IDT_ENTRY(28);
   IDT_ENTRY(29);
+  IDT_ENTRY(30);
   IDT_ENTRY(31);
 
   // Clock
@@ -83,6 +80,26 @@ void idt_init() {
   idt[33].segsel = (uint16_t) (GDT_IDX_CODE_0 << 3);                                         
   idt[33].attr = (uint16_t) 0x8E00;                                                          
   idt[33].offset_31_16 = (uint16_t) ((uint32_t)(&_isrKey) >> 16 & (uint32_t) 0xFFFF);
+
+  idt[88].offset_15_0 = (uint16_t) ((uint32_t)(&_isr88) & (uint32_t) 0xFFFF);        
+  idt[88].segsel = (uint16_t) (GDT_IDX_CODE_0 << 3);                                         
+  idt[88].attr = (uint16_t) 0xEE00;                                                          
+  idt[88].offset_31_16 = (uint16_t) ((uint32_t)(&_isr88) >> 16 & (uint32_t) 0xFFFF);
+
+  idt[89].offset_15_0 = (uint16_t) ((uint32_t)(&_isr89) & (uint32_t) 0xFFFF);        
+  idt[89].segsel = (uint16_t) (GDT_IDX_CODE_0 << 3);                                         
+  idt[89].attr = (uint16_t) 0xEE00;                                                          
+  idt[89].offset_31_16 = (uint16_t) ((uint32_t)(&_isr89) >> 16 & (uint32_t) 0xFFFF);
+
+  idt[100].offset_15_0 = (uint16_t) ((uint32_t)(&_isr100) & (uint32_t) 0xFFFF);        
+  idt[100].segsel = (uint16_t) (GDT_IDX_CODE_0 << 3);                                         
+  idt[100].attr = (uint16_t) 0xEE00;                                                          
+  idt[100].offset_31_16 = (uint16_t) ((uint32_t)(&_isr100) >> 16 & (uint32_t) 0xFFFF);
+
+  idt[123].offset_15_0 = (uint16_t) ((uint32_t)(&_isr123) & (uint32_t) 0xFFFF);        
+  idt[123].segsel = (uint16_t) (GDT_IDX_CODE_0 << 3);                                         
+  idt[123].attr = (uint16_t) 0xEE00;                                                          
+  idt[123].offset_31_16 = (uint16_t) ((uint32_t)(&_isr123) >> 16 & (uint32_t) 0xFFFF);
 
 }
 
