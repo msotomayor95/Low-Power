@@ -82,7 +82,23 @@ modoprotegido:
     ; Imprimir mensaje de bienvenida
 
     ; Inicializar pantalla
-    
+    xor edi, edi 
+    .filaNegra:
+        mov [fs:edi], C_BG_BLACK
+        inc edi
+        cmp edi, 0x50
+        jnz .filaNegra
+    .mapaVerde:
+        mov [fs:edi], C_BG_GREEN
+        inc edi
+        cmp edi, 0xCD0
+        jnz .mapaVerde:
+    .tableroNegro:
+        mov [fs:edi], C_BG_BLACK
+        inc edi
+        cmp edi, 0xFA0
+        jnz .tableroNegro
+    xchg bx, bx
     ; Inicializar el manejador de memoria
  
     ; Inicializar el directorio de paginas
