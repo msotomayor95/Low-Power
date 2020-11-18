@@ -18,7 +18,27 @@ paddr_t mmu_next_free_kernel_page(void) {
 }
 
 paddr_t mmu_init_kernel_dir(void) {
-  return 0;
+	pd_entry *pd = (pd_entry *)KERNEL_PAGE_DIR;
+  	pt_entry *pt = (pt_entry *)KERNEL_PAGE_TABLE_0;
+
+  	for (int i = 0; i < 1024; ++i) {
+  		pd[i] = (pd_entry){0};
+  		pt[i] = (pt_entry){0};
+  	}
+
+  	pd[0].present = MMU_FLAG_PRESENT;
+  	pd[0].user_supervisor = MMU_FLAG_SUPERVISOR;
+  	pd[0].read_write = MMU_FLAG_READWRITE;
+  	pd[0].page_table_base = ((uint32_t) pt)>>12;
+
+  	for (int i = 0; i < 1024; ++i) {
+  		pt[i].present = MMU_FLAG_PRESENT;
+  		pt[i].user_supervisor = MMU_FLAG_SUPERVISOR;
+  		pt[i].read_write = MMU_FLAG_READWRITE;
+  		pt[i].physical_address_base = i;
+  	}
+
+  	return (paddr_t)pd;
 }
 
 // void mmu_map_page(uint32_t cr3, vaddr_t virt, paddr_t phy, uint32_t attrs) {}

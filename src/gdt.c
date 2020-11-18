@@ -3,7 +3,7 @@
  TRABAJO PRACTICO 3 - System Programming - ORGANIZACION DE COMPUTADOR II - FCEN
 ================================================================================
 
-  Definicion de la tabla de descriptores globales  .limit_15_0 = 0x1F3F,
+  Definicion de la tabla de descriptores globales
 */
 
 #include "gdt.h"

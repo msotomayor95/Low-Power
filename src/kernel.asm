@@ -14,12 +14,15 @@ extern pic_reset
 extern pic_enable
 
 extern GDT_DESC
+extern mmu_init_kernel_dir
+extern imprimir_libretas
 
 %define GDT_IDX_DATA_0  10
 %define GDT_IDX_CODE_0  12
 %define GDT_IDX_VIDEO_0 14
 %define C_BG_BLACK 0
 %define C_BG_GREEN 8192
+%define KERNEL_PAGE_DIR 0x00025000
 
 BITS 16
 ;; Saltear seccion de datos
@@ -95,27 +98,35 @@ modoprotegido:
         add edi, 2
         cmp edi, 0xA0
         jnz .filaNegra
-    xchg bx, bx
     .mapaVerde:
         mov WORD [fs:edi], C_BG_GREEN
         add edi, 2
         cmp edi, 0x19A0
         jnz .mapaVerde
-    xchg bx, bx
     .tableroNegro:
         mov WORD [fs:edi], C_BG_BLACK
         add edi, 2
         cmp edi, 0x1F40
         jnz .tableroNegro
-    xchg bx, bx
     ; Inicializar el manejador de memoria
  
     ; Inicializar el directorio de paginas
-    
+    xchg bx, bx
+    call mmu_init_kernel_dir
+
     ; Cargar directorio de paginas
+    ;mov eax, KERNEL_PAGE_DIR<<12
+    
+    mov cr3, eax
 
     ; Habilitar paginacion
+    mov eax, cr0
+    or eax, 0x80000000
+    mov cr0, eax
     
+    call imprimir_libretas
+    xchg bx, bx
+
     ; Inicializar tss
 
     ; Inicializar tss de la tarea Idle

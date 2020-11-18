@@ -68,3 +68,8 @@ void screen_draw_box(uint32_t fInit, uint32_t cInit, uint32_t fSize,
     }
   }
 }
+
+void imprimir_libretas(){
+  print("731/14", 40, 20, 0x000F);
+  print("362/15", 40, 21, 0x000F);
+}
