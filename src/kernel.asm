@@ -111,12 +111,11 @@ modoprotegido:
     ; Inicializar el manejador de memoria
  
     ; Inicializar el directorio de paginas
-    xchg bx, bx
     call mmu_init_kernel_dir
 
+    ; paddr_t phy_start, paddr_t code_start, size_t pages, vaddr_t v_start, uint8_t rw, uint8_t user_supervisor;
+
     ; Cargar directorio de paginas
-    ;mov eax, KERNEL_PAGE_DIR<<12
-    
     mov cr3, eax
 
     ; Habilitar paginacion

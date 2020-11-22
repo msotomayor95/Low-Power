@@ -44,11 +44,17 @@ void mmu_init(void);
 
 paddr_t mmu_next_free_kernel_page(void);
 
-void mmu_map_page(uint32_t cr3, vaddr_t virt, paddr_t phy, uint32_t attrs);
+paddr_t mmu_next_free_task_page(void);
+
+void mmu_map_page(uint32_t cr3, vaddr_t virt, paddr_t phy, uint8_t rw, uint8_t supervisor);
 
 paddr_t mmu_unmap_page(uint32_t cr3, vaddr_t virt);
 
 paddr_t mmu_init_kernel_dir(void);
 
-paddr_t mmu_init_task_dir(paddr_t phy_start, paddr_t code_start, size_t pages);
+paddr_t mmu_init_task_dir(paddr_t phy_start, paddr_t code_start, size_t pages, vaddr_t v_start, uint8_t rw, uint8_t user_supervisor);
+
+void mmu_kernel_identity_mapping (pd_entry *pd, pt_entry *pt);
+
+paddr_t NEXT_FREE_KERNEL_PAGE;
 #endif //  __MMU_H__

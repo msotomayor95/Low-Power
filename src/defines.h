@@ -63,11 +63,14 @@
  * copiaran al destino indicado por TASK_<X>_PHY_START.
  */
 
+
 /* Direcciones fisicas de directorios y tablas de paginas del KERNEL */
 /* -------------------------------------------------------------------------- */
-#define KERNEL_PAGE_DIR     (0x00027000)
-#define KERNEL_PAGE_TABLE_0 (0x00028000)
+#define KERNEL_PAGE_DIR     (0x00025000)
+#define KERNEL_PAGE_TABLE_0 (0x00026000)
 #define KERNEL_STACK        (0x00025000)
+
+#define FREE_KERNEL_SPACE (0x100000)
 
 #define MMU_FLAG_PRESENT (0x1)
 #define MMU_FLAG_SUPERVISOR (0x0)
