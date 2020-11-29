@@ -107,6 +107,41 @@ gdt_entry_t gdt[GDT_COUNT] = {
             .g = 0x00,
             .base_31_24 = 0x00,
         },
+    [GDT_IDX_TSS_INIT] = 
+        {
+            .limit_15_0 = SIZE_TSS-1,
+            .base_15_0 = 0x0,
+            .base_23_16 = 0x0,
+            .type = 0x9,
+            .s = 0x00,
+            .dpl = 0x00,
+            .p = 0x01,
+            .limit_19_16 = 0x00,
+            .avl = 0x0,
+            .l = 0x0,
+            .db = 0x1,
+            .g = 0x00,
+            .base_31_24 = 0x00,
+        },
+    [GDT_IDX_TSS_IDLE] = 
+        {
+            .limit_15_0 = SIZE_TSS-1,
+            .base_15_0 = 0x0,
+            .base_23_16 = 0x0,
+            .type = 0x9,
+            .s = 0x00,
+            .dpl = 0x00,
+            .p = 0x01,
+            .limit_19_16 = 0x00,
+            .avl = 0x0,
+            .l = 0x0,
+            .db = 0x1,
+            .g = 0x00,
+            .base_31_24 = 0x00,
+        },
 };
+
+// #define GDT_TSS_INIT   15
+        // #define GDT_TSS_IDLE      16
 
 gdt_descriptor_t GDT_DESC = {sizeof(gdt) - 1, (uint32_t)&gdt};

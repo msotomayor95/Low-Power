@@ -59,20 +59,26 @@ void mmu_kernel_identity_mapping(pd_entry *pd, pt_entry *pt) {
 
  void mmu_map_page(uint32_t cr3, vaddr_t virt, paddr_t phy, uint8_t rw, uint8_t supervisor) {
  	pd_entry *pd = (pd_entry *)((cr3>>12)<<12);
- 	uint32_t pd_entry = virt>>22;
- 	if (pd[pd_entry].present != 1) {
- 		pd[pd_entry].read_write = rw;
- 		pd[pd_entry].user_supervisor = supervisor;
- 		pd[pd_entry].present = 1;
+ 	uint32_t pd_index = virt>>22;
+ 	pt_entry *pt = NULL;
+ 	if (pd[pd_index].present != 1) {
+ 		pd[pd_index].read_write = rw;
+ 		pd[pd_index].user_supervisor = supervisor;
+ 		pd[pd_index].present = 1;
  		paddr_t new_page = mmu_next_free_kernel_page();		
- 		pd[pd_entry].page_table_base = new_page>>12;
+ 		pd[pd_index].page_table_base = new_page>>12;
+	 	pt = (pt_entry *) new_page;
+	 	for (int i = 0; i < 1024; ++i) {
+	 		pt[i] = (pt_entry){0};
+	 	}
  	}
- 	pt_entry *pt = (pt_entry *) ((pd[pd_entry].page_table_base)<<12);
- 	uint32_t pt_entry = ((virt<<10)>>22);
- 	pt[pt_entry].present = 1;
- 	pt[pt_entry].read_write = rw;
- 	pt[pt_entry].user_supervisor = supervisor;
- 	pt[pt_entry].physical_address_base = phy>>12;
+
+ 	pt = (pt_entry *) ((pd[pd_index].page_table_base)<<12);
+ 	uint32_t pt_index = ((virt<<10)>>22);
+ 	pt[pt_index].present = 1;
+ 	pt[pt_index].read_write = rw;
+ 	pt[pt_index].user_supervisor = supervisor;
+ 	pt[pt_index].physical_address_base = phy>>12;
 
  }
 
@@ -91,28 +97,31 @@ void mmu_kernel_identity_mapping(pd_entry *pd, pt_entry *pt) {
  	// en vez de pasarle un cr3, le pasamos la direccion al nuevo directorio de pagina
  	// no es necesario ningun shift previo ya que todas las direcciones se mueven de a 0x1000
  	// y el area libre para paginas empieza en 100000
- 	uint32_t new_dir = mmu_next_free_kernel_page();
- 	pd_entry *pd = (pd_entry *) new_dir;
+ 	uint32_t new_cr3 = mmu_next_free_kernel_page();
+ 	pd_entry *pd = (pd_entry *) new_cr3;
  	pt_entry *pt = (pt_entry *) mmu_next_free_kernel_page(); 
  	for (int i = 0; i < 1024; ++i) {
   		pd[i] = (pd_entry){0};
   		pt[i] = (pt_entry){0};
   	}
-
-  	mmu_kernel_identity_mapping(pd_entry *pd, pt_entry *pt);
+	mmu_kernel_identity_mapping(pd, pt);
+  	
   	vaddr_t v_temp = v_start;
  	for (int i = 0; i < 4; ++i) {
- 		mmu_map_page(new_dir, v_temp, phy_start, rw, user_supervisor);
+ 		mmu_map_page(new_cr3, v_temp, phy_start, rw, user_supervisor);
  		phy_start = phy_start + 0x1000;
  		v_temp = v_temp + 0x1000;
  	}
 
  	uint8_t *byte_pointer_source = (uint8_t *) code_start;
   	uint8_t *byte_pointer_destiny = (uint8_t *) v_start;
-  	for (int i = 0; i < 0x1000 * pages; ++i)
-  	{
+  	for (uint32_t i = 0; i < 0x1000 * pages; ++i) {
   		byte_pointer_destiny[i] = byte_pointer_source[i];
   	}
- 	return 0;
+ 	return new_cr3;
+ }
+
+ paddr_t init_rick(void){
+ 	return mmu_init_task_dir(0x1D00000, 0x10000, 0x4, 0x1D00000, 0x1, 0x0);
  }
 

@@ -25,6 +25,9 @@
 // X Columnas
 #define SIZE_M 80
 
+//tamanio de una tss
+#define SIZE_TSS 0x68
+
 /* Indices en la gdt */
 /* -------------------------------------------------------------------------- */
 #define GDT_IDX_NULL_DESC 0
@@ -33,6 +36,8 @@
 #define GDT_IDX_CODE_0    12
 #define GDT_IDX_CODE_3    13
 #define GDT_IDX_VIDEO_0   14
+#define GDT_IDX_TSS_INIT  15
+#define GDT_IDX_TSS_IDLE  16
 #define GDT_COUNT         35
 
 

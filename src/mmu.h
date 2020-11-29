@@ -56,5 +56,7 @@ paddr_t mmu_init_task_dir(paddr_t phy_start, paddr_t code_start, size_t pages, v
 
 void mmu_kernel_identity_mapping (pd_entry *pd, pt_entry *pt);
 
+paddr_t init_rick(void);
+
 paddr_t NEXT_FREE_KERNEL_PAGE;
 #endif //  __MMU_H__

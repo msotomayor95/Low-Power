@@ -14,8 +14,13 @@ extern pic_reset
 extern pic_enable
 
 extern GDT_DESC
+extern mmu_init
+extern mmu_init_task_dir
 extern mmu_init_kernel_dir
+extern init_rick
+extern tss_init
 extern imprimir_libretas
+
 
 %define GDT_IDX_DATA_0  10
 %define GDT_IDX_CODE_0  12
@@ -108,12 +113,16 @@ modoprotegido:
         add edi, 2
         cmp edi, 0x1F40
         jnz .tableroNegro
+    
     ; Inicializar el manejador de memoria
+    call mmu_init
  
     ; Inicializar el directorio de paginas
     call mmu_init_kernel_dir
 
-    ; paddr_t phy_start, paddr_t code_start, size_t pages, vaddr_t v_start, uint8_t rw, uint8_t user_supervisor;
+    ;.inicializadoDeUnaTarea:
+    ;xchg bx, bx
+    ;call init_rick               ; esto devuelve un cr3 de una tarea rick
 
     ; Cargar directorio de paginas
     mov cr3, eax
@@ -122,12 +131,14 @@ modoprotegido:
     mov eax, cr0
     or eax, 0x80000000
     mov cr0, eax
-    
-    call imprimir_libretas
+    .despuesDeActivarPaginacion:
     xchg bx, bx
+    call imprimir_libretas
 
     ; Inicializar tss
-
+    .despuesDeInicializarTSS:
+    call tss_init
+    xchg bx, bx
     ; Inicializar tss de la tarea Idle
 
     ; Inicializar el scheduler
