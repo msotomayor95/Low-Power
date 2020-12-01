@@ -25,6 +25,8 @@ extern imprimir_libretas
 %define GDT_IDX_DATA_0  10
 %define GDT_IDX_CODE_0  12
 %define GDT_IDX_VIDEO_0 14
+%define GDT_IDX_TSS_INIT 15
+%define GDT_IDX_TSS_IDLE 16
 %define C_BG_BLACK 0
 %define C_BG_GREEN 8192
 %define KERNEL_PAGE_DIR 0x00025000
@@ -78,6 +80,10 @@ start:
     jmp (GDT_IDX_CODE_0<<3):modoprotegido
 
 BITS 32
+
+offset: dd 0
+selector: dw 0
+
 modoprotegido:
     ; Establecer selectores de segmentos
     mov ax, GDT_IDX_DATA_0
@@ -115,6 +121,9 @@ modoprotegido:
         jnz .tableroNegro
     
     ; Inicializar el manejador de memoria
+    ;mov eax, 1
+    ;push eax
+    ;push eax
     call mmu_init
  
     ; Inicializar el directorio de paginas
@@ -132,35 +141,37 @@ modoprotegido:
     or eax, 0x80000000
     mov cr0, eax
     .despuesDeActivarPaginacion:
-    xchg bx, bx
-    call imprimir_libretas
+    ;call imprimir_libretas
 
-    ; Inicializar tss
-    .despuesDeInicializarTSS:
+    ; Inicializar tss de la tarea Idle e inicial
     call tss_init
-    xchg bx, bx
-    ; Inicializar tss de la tarea Idle
 
     ; Inicializar el scheduler
+    
 
     ; Inicializar la IDT
-
     call idt_init
     
     ; Cargar IDT
- 
     lidt [IDT_DESC]
-    ; Configurar controlador de interrupciones
 
+    ; Configurar controlador de interrupciones
     call pic_reset
     call pic_enable
 
     ; Cargar tarea inicial
+    mov ax, GDT_IDX_TSS_INIT<<3
+    ltr ax
 
     ; Habilitar interrupciones
     sti
 
     ; Saltar a la primera tarea: Idle
+    .antesDelJumPFar:
+    xchg bx, bx
+    mov ax, GDT_IDX_TSS_IDLE<<3
+    mov [selector], ax
+    jmp far [offset]
 
     ; Ciclar infinitamente (por si algo sale mal...)
     mov eax, 0xFFFF

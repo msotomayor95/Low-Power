@@ -25,7 +25,6 @@ idle:
         print_text_pm ebx, 1, 0x0f, 49, 76-1
         mov ebx, close
         print_text_pm ebx, 1, 0x0f, 49, 76+1
-
     jmp .loop
 
 number:   dd 0x00000000
