@@ -9,6 +9,7 @@ BITS 32
 %include "print.mac"
 
 idle:
+    
     .loop:
         inc dword [number]
         cmp dword [number], 0x4
@@ -28,7 +29,6 @@ idle:
     jmp .loop
 
 number:   dd 0x00000000
-
 clock: db '|/-\'
 
 open: db '('

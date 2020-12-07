@@ -28,17 +28,23 @@
 //tamanio de una tss
 #define SIZE_TSS 0x68
 
+//first tss
+#define FIRST_TSS 17
+
 /* Indices en la gdt */
 /* -------------------------------------------------------------------------- */
-#define GDT_IDX_NULL_DESC 0
-#define GDT_IDX_DATA_0    10
-#define GDT_IDX_DATA_3    11
-#define GDT_IDX_CODE_0    12
-#define GDT_IDX_CODE_3    13
-#define GDT_IDX_VIDEO_0   14
-#define GDT_IDX_TSS_INIT  15
-#define GDT_IDX_TSS_IDLE  16
-#define GDT_COUNT         35
+#define GDT_IDX_NULL_DESC  0
+#define GDT_IDX_DATA_0     10
+#define GDT_IDX_DATA_3     11
+#define GDT_IDX_CODE_0     12
+#define GDT_IDX_CODE_3     13
+#define GDT_IDX_VIDEO_0    14
+#define GDT_IDX_TSS_INIT   15
+#define GDT_IDX_TSS_IDLE   16
+#define GDT_IDX_TSS_RICK   17
+#define GDT_IDX_TSS_MORTY  18
+
+#define GDT_COUNT          35
 
 
 /* Offsets en la gdt */
@@ -59,7 +65,7 @@
 /* -------------------------------------------------------------------------- */
 
 // direccion virtual del codigo
-#define TASK_CODE_VIRTUAL 0x01D00000
+#define TASK_CODE_VIRTUAL 0x1D00000
 #define TASK_PAGES        4
 
 /* Direcciones fisicas de codigos */
@@ -68,6 +74,10 @@
  * copiaran al destino indicado por TASK_<X>_PHY_START.
  */
 
+#define CODE_RICK     0x10000
+#define CODE_MORTY 	  0x14000
+#define PLAYER_RICK   0x1D00000
+#define PLAYER_MORTY  0x1D04000
 
 /* Direcciones fisicas de directorios y tablas de paginas del KERNEL */
 /* -------------------------------------------------------------------------- */

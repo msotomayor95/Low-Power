@@ -81,16 +81,25 @@ ISR 31
 ;; -------------------------------------------------------------------------- ;;
 
 _isrClock:
+    pushad
     call pic_finish1
     call next_clock
-    iret
+    call sched_next_task
+    str dx
+    cmp ax, dx
+    je .fin
+    mov [sched_task_selector], ax
+    jmp far [sched_task_offset]
+    .fin:
+        popad
+        iret
 
 ;; Rutina de atención del TECLADO
 ;; -------------------------------------------------------------------------- ;;
 
 _isrKey:
-    call pic_finish1
     pushad
+    call pic_finish1
     xor eax, eax
     in al, 0x60
     cmp eax, 0x80

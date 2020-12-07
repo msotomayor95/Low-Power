@@ -18,8 +18,10 @@ extern mmu_init
 extern mmu_init_task_dir
 extern mmu_init_kernel_dir
 extern init_rick
+extern init_morty
 extern tss_init
 extern imprimir_libretas
+extern sched_init
 
 
 %define GDT_IDX_DATA_0  10
@@ -43,6 +45,9 @@ start_rm_len equ    $ - start_rm_msg
 
 start_pm_msg db     'Iniciando kernel en Modo Protegido'
 start_pm_len equ    $ - start_pm_msg
+
+offset: dd 0
+selector: dw 0
 
 ;;
 ;; Seccion de código.
@@ -80,9 +85,6 @@ start:
     jmp (GDT_IDX_CODE_0<<3):modoprotegido
 
 BITS 32
-
-offset: dd 0
-selector: dw 0
 
 modoprotegido:
     ; Establecer selectores de segmentos
@@ -129,9 +131,9 @@ modoprotegido:
     ; Inicializar el directorio de paginas
     call mmu_init_kernel_dir
 
-    ;.inicializadoDeUnaTarea:
-    ;xchg bx, bx
-    ;call init_rick               ; esto devuelve un cr3 de una tarea rick
+    ; .inicializadoDeUnaTarea:
+    ; xchg bx, bx
+    ; call init_morty               ; esto devuelve un cr3 de una tarea rick
 
     ; Cargar directorio de paginas
     mov cr3, eax
@@ -140,14 +142,14 @@ modoprotegido:
     mov eax, cr0
     or eax, 0x80000000
     mov cr0, eax
-    .despuesDeActivarPaginacion:
     ;call imprimir_libretas
 
     ; Inicializar tss de la tarea Idle e inicial
+    .activaTSS:
     call tss_init
 
     ; Inicializar el scheduler
-    
+    call sched_init
 
     ; Inicializar la IDT
     call idt_init
@@ -167,17 +169,17 @@ modoprotegido:
     sti
 
     ; Saltar a la primera tarea: Idle
-    .antesDelJumPFar:
     xchg bx, bx
+    .antesDelJumPFar:
     mov ax, GDT_IDX_TSS_IDLE<<3
     mov [selector], ax
     jmp far [offset]
 
     ; Ciclar infinitamente (por si algo sale mal...)
-    mov eax, 0xFFFF
-    mov ebx, 0xFFFF
-    mov ecx, 0xFFFF
-    mov edx, 0xFFFF
+    ; mov eax, 0xFFFF
+    ; mov ebx, 0xFFFF
+    ; mov ecx, 0xFFFF
+    ; mov edx, 0xFFFF
     jmp $
 
 ;; -------------------------------------------------------------------------- ;;

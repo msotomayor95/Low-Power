@@ -1,9 +1,10 @@
 #include "syscall.h"
+#include "i386.h"
 
 void meeseks1_func(void);
 
 void task(void) {
-  syscall_meeseeks((uint32_t)&meeseks1_func, 40, 25);
+  //syscall_meeseeks((uint32_t)&meeseks1_func, 40, 25);
 
   while (1) {
     __asm volatile("nop");

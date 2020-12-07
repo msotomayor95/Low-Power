@@ -10,7 +10,9 @@
 #define __SCHED_H__
 
 #include "types.h"
+#include "defines.h"
 
+int tarea_actual;
 void sched_init();
 uint16_t sched_next_task();
 

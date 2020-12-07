@@ -9,9 +9,14 @@
 #include "sched.h"
 
 
+
 void sched_init(void) {
+	tarea_actual = 0;
+
 }
 
 uint16_t sched_next_task(void) {
-  return 0;
+  tarea_actual = (tarea_actual + 1) % 2;
+  uint16_t resultado = ((tarea_actual + FIRST_TSS) << 3);
+  return resultado;
 }
