@@ -12,6 +12,9 @@ BITS 32
 sched_task_offset:     dd 0xFFFFFFFF
 sched_task_selector:   dw 0xFFFF
 
+idle_offset:     dd 0xFFFFFFFF
+idle_selector:   dw 0xFFFF
+
 extern print_hex
 
 ;; PIC
@@ -19,6 +22,8 @@ extern pic_finish1
 
 ;; Sched
 extern sched_next_task
+
+%define GDT_IDX_TSS_IDLE 16
 
 ;;
 global _isrClock
@@ -119,19 +124,32 @@ _isrKey:
 ;; -------------------------------------------------------------------------- ;;
 
 _isr88:
+    xchg bx, bx
     mov eax, 0x58
+    mov dx, GDT_IDX_TSS_IDLE<<3
+    mov [idle_selector], dx
+    jmp far [idle_offset]
     iret
 
 _isr89:
     mov eax, 0x59
+    mov dx, GDT_IDX_TSS_IDLE<<3
+    mov [idle_selector], dx
+    jmp far [idle_offset]
     iret
 
 _isr100:
     mov eax, 0x64
+    mov dx, GDT_IDX_TSS_IDLE<<3
+    mov [idle_selector], dx
+    jmp far [idle_offset]
     iret
 
 _isr123:
     mov eax, 0x7b
+    mov dx, GDT_IDX_TSS_IDLE<<3
+    mov [idle_selector], dx
+    jmp far [idle_offset]
     iret
 
 ;; Funciones Auxiliares
