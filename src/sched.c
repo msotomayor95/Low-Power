@@ -12,7 +12,11 @@
 
 void sched_init(void) {
 	tarea_actual = 0;
-
+	for (int i = 0; i < 11; ++i) {
+		seed_array[i].x = (uint8_t)(rand() % 80);
+		seed_array[i].y = (uint8_t)(rand() % 40);
+		print ("s", seed_array[i].x + 1, seed_array[i].y, C_FG_LIGHT_MAGENTA);
+	}
 }
 
 uint16_t sched_next_task(void) {

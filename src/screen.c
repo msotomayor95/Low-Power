@@ -70,6 +70,15 @@ void screen_draw_box(uint32_t fInit, uint32_t cInit, uint32_t fSize,
 }
 
 void imprimir_libretas(){
-  print("731/14", 40, 20, 0x000F);
-  print("362/15", 40, 21, 0x000F);
+  print ("731/14", 40, 20, 0x000F);
+  print ("362/15", 40, 21, 0x000F);
+}
+
+void screen_init(){
+  screen_draw_box (0, 0, 50, 80, 255, C_BG_BLACK);
+  screen_draw_box (1, 0, 40, 80, 255, C_BG_GREEN);
+  screen_draw_box (42, 4, 5, 12, 255, C_BG_LIGHT_GREY);
+  screen_draw_box (43, 5, 3, 10, 255, C_BG_RED);
+  screen_draw_box (42, 64, 5, 12, 255, C_BG_LIGHT_GREY);
+  screen_draw_box (43, 65, 3, 10, 255, C_BG_BLUE);
 }

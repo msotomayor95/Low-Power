@@ -24,6 +24,8 @@ extern pic_finish1
 extern sched_next_task
 
 %define GDT_IDX_TSS_IDLE 16
+%define GDT_IDX_TSS_RICK 17
+%define GDT_IDX_TSS_MORTY 18
 
 ;;
 global _isrClock
@@ -41,8 +43,21 @@ global _isr123
 global _isr%1
 
 _isr%1:
+    pushad
     mov eax, %1
-    jmp $
+    str dx
+    cmp dx, GDT_IDX_TSS_RICK <<3
+    je .ganoMorty
+    cmp dx, GDT_IDX_TSS_MORTY <<3
+    je .ganoRick
+    call sched_next_task
+    mov [sched_task_selector], ax
+    jmp far [sched_task_offset]
+    .ganoMorty:
+        jmp $
+    .ganoRick:
+        jmp $    
+    popad
 
 %endmacro
 

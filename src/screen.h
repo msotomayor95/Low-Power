@@ -33,5 +33,7 @@ void screen_draw_box(uint32_t fInit, uint32_t cInit, uint32_t fSize,
                      uint32_t cSize, uint8_t character, uint8_t attr);
 
 void screen_draw_layout(void);
+void imprimir_libretas(void);
+void screen_init(void);
 
 #endif //  __SCREEN_H__

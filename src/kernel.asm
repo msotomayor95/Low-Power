@@ -7,28 +7,38 @@
 
 global start
 
+; INTERRUPCIONES
 extern IDT_DESC
 extern idt_init
 
+; PIC
 extern pic_reset
 extern pic_enable
 
+; GDT
 extern GDT_DESC
+
+; Administrador de memoria
 extern mmu_init
 extern mmu_init_task_dir
 extern mmu_init_kernel_dir
-extern init_rick
-extern init_morty
+
+; inicializadores 
 extern tss_init
-extern imprimir_libretas
 extern sched_init
+extern screen_init
 
+; funciones dummy
+extern imprimir_libretas
 
+; GDT Defines
 %define GDT_IDX_DATA_0  10
 %define GDT_IDX_CODE_0  12
 %define GDT_IDX_VIDEO_0 14
 %define GDT_IDX_TSS_INIT 15
 %define GDT_IDX_TSS_IDLE 16
+
+; Defines varios
 %define C_BG_BLACK 0
 %define C_BG_GREEN 8192
 %define KERNEL_PAGE_DIR 0x00025000
@@ -105,22 +115,23 @@ modoprotegido:
     ; Imprimir mensaje de bienvenida
 
     ; Inicializar pantalla
-    xor edi, edi 
-    .filaNegra:
-        mov WORD [fs:edi], C_BG_BLACK
-        add edi, 2
-        cmp edi, 0xA0
-        jnz .filaNegra
-    .mapaVerde:
-        mov WORD [fs:edi], C_BG_GREEN
-        add edi, 2
-        cmp edi, 0x19A0
-        jnz .mapaVerde
-    .tableroNegro:
-        mov WORD [fs:edi], C_BG_BLACK
-        add edi, 2
-        cmp edi, 0x1F40
-        jnz .tableroNegro
+    ; xor edi, edi 
+    ; .filaNegra:
+    ;     mov WORD [fs:edi], C_BG_BLACK
+    ;     add edi, 2
+    ;     cmp edi, 0xA0
+    ;     jnz .filaNegra
+    ; .mapaVerde:
+    ;     mov WORD [fs:edi], C_BG_GREEN
+    ;     add edi, 2
+    ;     cmp edi, 0x19A0
+    ;     jnz .mapaVerde
+    ; .tableroNegro:
+    ;     mov WORD [fs:edi], C_BG_BLACK
+    ;     add edi, 2
+    ;     cmp edi, 0x1F40
+    ;     jnz .tableroNegro
+    call screen_init
     
     ; Inicializar el manejador de memoria
     ;mov eax, 1
