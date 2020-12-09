@@ -15,7 +15,7 @@ void sched_init(void) {
 	for (int i = 0; i < 11; ++i) {
 		seed_array[i].x = (uint8_t)(rand() % 80);
 		seed_array[i].y = (uint8_t)(rand() % 40);
-		print ("s", seed_array[i].x + 1, seed_array[i].y, C_FG_LIGHT_MAGENTA);
+		screen_draw_box (seed_array[i].y, seed_array[i].x, 1, 1, 83, C_FG_BROWN + C_BG_GREEN);
 	}
 }
 
