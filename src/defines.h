@@ -33,18 +33,38 @@
 
 /* Indices en la gdt */
 /* -------------------------------------------------------------------------- */
-#define GDT_IDX_NULL_DESC  0
-#define GDT_IDX_DATA_0     10
-#define GDT_IDX_DATA_3     11
-#define GDT_IDX_CODE_0     12
-#define GDT_IDX_CODE_3     13
-#define GDT_IDX_VIDEO_0    14
-#define GDT_IDX_TSS_INIT   15
-#define GDT_IDX_TSS_IDLE   16
-#define GDT_IDX_TSS_RICK   17
-#define GDT_IDX_TSS_MORTY  18
+#define GDT_IDX_NULL_DESC  		0
+#define GDT_IDX_DATA_0     		10
+#define GDT_IDX_DATA_3     		11
+#define GDT_IDX_CODE_0     		12
+#define GDT_IDX_CODE_3     		13
+#define GDT_IDX_VIDEO_0    		14
+#define GDT_IDX_TSS_INIT   		15
+#define GDT_IDX_TSS_IDLE   		16
+#define GDT_IDX_TSS_RICK   		17
+#define GDT_IDX_TSS_MORTY  		18
+#define GDT_IDX_TSS_MR1  		19
+#define GDT_IDX_TSS_MM1  		20
+#define GDT_IDX_TSS_MR2  		21
+#define GDT_IDX_TSS_MM2 		22
+#define GDT_IDX_TSS_MR3 		23
+#define GDT_IDX_TSS_MM3 		24
+#define GDT_IDX_TSS_MR4 		25
+#define GDT_IDX_TSS_MM4 		26
+#define GDT_IDX_TSS_MR5 		27
+#define GDT_IDX_TSS_MM5 		28
+#define GDT_IDX_TSS_MR6 		29
+#define GDT_IDX_TSS_MM6 		30
+#define GDT_IDX_TSS_MR7  		31
+#define GDT_IDX_TSS_MM7  		32
+#define GDT_IDX_TSS_MR8  		33
+#define GDT_IDX_TSS_MM8  		34
+#define GDT_IDX_TSS_MR9  		35
+#define GDT_IDX_TSS_MM9  		36
+#define GDT_IDX_TSS_MR10  		37
+#define GDT_IDX_TSS_MM10  		38
 
-#define GDT_COUNT          35
+#define GDT_COUNT          		39
 
 
 /* Offsets en la gdt */
