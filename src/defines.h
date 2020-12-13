@@ -28,8 +28,11 @@
 //tamanio de una tss
 #define SIZE_TSS 0x68
 
-//first tss
+//first tss descriptor
 #define FIRST_TSS 17
+
+//tss array base
+#define BASE_TSS 2
 
 /* Indices en la gdt */
 /* -------------------------------------------------------------------------- */
@@ -80,6 +83,8 @@
 #define KERNEL 0x00001200
 // direccion fisica del buffer de video
 #define VIDEO 0x000B8000
+//base fisica del mapa
+#define BASE_MAP 0x400000
 
 /* Direcciones virtuales de código, pila y datos */
 /* -------------------------------------------------------------------------- */

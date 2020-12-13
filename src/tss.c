@@ -54,7 +54,7 @@ tss_t tss_idle = {
 	.iomap = 0
 };
 
-tss_t tss_tasks[22];
+
 
 void tss_init() {
 	vaddr_t cr3 = init_rick();
@@ -145,15 +145,29 @@ void tss_init() {
 	gdt[GDT_IDX_TSS_IDLE].base_23_16 = (uint8_t)(((uint32_t)&tss_idle)>>16);
 	gdt[GDT_IDX_TSS_IDLE].base_31_24 = (uint8_t)(((uint32_t)&tss_idle)>>24);
 
-	gdt[GDT_IDX_TSS_RICK].base_15_0 = (uint16_t)((uint32_t)&tss_tasks[0]);
-	gdt[GDT_IDX_TSS_RICK].base_23_16 = (uint8_t)(((uint32_t)&tss_tasks[0])>>16);
-	gdt[GDT_IDX_TSS_RICK].base_31_24 = (uint8_t)(((uint32_t)&tss_tasks[0])>>24);
-
-	gdt[GDT_IDX_TSS_MORTY].base_15_0 = (uint16_t)((uint32_t)&tss_tasks[1]);
-	gdt[GDT_IDX_TSS_MORTY].base_23_16 = (uint8_t)(((uint32_t)&tss_tasks[1])>>16);
-	gdt[GDT_IDX_TSS_MORTY].base_31_24 = (uint8_t)(((uint32_t)&tss_tasks[1])>>24);
+	for (int i = GDT_IDX_TSS_RICK; i < GDT_COUNT; ++i) {
+		gdt[i].base_15_0 = (uint16_t)((uint32_t)&tss_tasks[i]);
+		gdt[i].base_23_16 = (uint8_t)(((uint32_t)&tss_tasks[i])>>16);
+		gdt[i].base_31_24 = (uint8_t)(((uint32_t)&tss_tasks[i])>>24);
+	}
 
 }
 
-void tss_task_init(void) {}
+void tss_task_init(uint32_t index, vaddr_t code_start, uint8_t x, uint8_t y) { 
+	uint32_t map_offset = 80*y*8*1024 + x*8*1024;
+	paddr_t map_dir = BASE_MAP + map_offset;				// 8 * 1024 = 2 paginas. 80*y*8*1024 + x*8*1024
+	uint32_t stack0_index = index;
+	index = index + BASE_TSS;
+	tss_tasks[index] = tss_tasks[index % 2];				// igualo la tss de la tarea que estoy creando al de su creador (rick = 0 o morty = 1)
+
+	// solo hay unos campos que difieren del meeseek con su creador
+	// selecciono una pagina de 20 que tenia previamente inicializadas
+	tss_tasks[index].esp0 = stack0[stack0_index] + 0x1000;
+
+	// dir virtual mapeada a la primera de las 2 paginas de la tarea
+	tss_tasks[index].eip = code_start; 
+	// dir virtual mapeada a la direccion de la segunda pagina de la tarea
+	tss_tasks[index].esp = code_start + 0x1000*0x2 ; // el final de la segunda pagina?
+	tss_tasks[index].ebp = code_start + 0x1000*0x2;
+}
 
