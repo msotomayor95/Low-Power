@@ -21,6 +21,11 @@ extern print_hex
 extern pic_finish1
 
 ;; Sched
+extern meeseek_llamo_crear_meeseek
+extern matar_meeseek
+extern valores_validos
+extern puedo_crear_meeseek
+extern crear_meeseek
 extern sched_next_task
 
 %define GDT_IDX_TSS_IDLE 16
@@ -139,12 +144,50 @@ _isrKey:
 ;; -------------------------------------------------------------------------- ;;
 
 _isr88:
-    xchg bx, bx
-    mov eax, 0x58
+    ; eax = code_start
+    ; ebx = x
+    ; ecx = y
+
+    pushad
+    push ecx
+    push ebx
+    push eax
+    
+    call meeseek_llamo_crear_meeseek
+    cmp al, 0
+    jne .checkeoValores
+    
+    ; Si llegue aca es porque un Mr. M llamo a esta syscall, por lo que muere.
+    call matar_meeseek
+    jmp .saltar_idle
+
+    .checkeoValores:
+    call valores_validos
+    cmp al, 1
+    je .checkeoSiHayEspacioParaUnNuevoMrM
+    jmp $
+    
+    .checkeoSiHayEspacioParaUnNuevoMrM:
+    call puedo_crear_meeseek
+    cmp al, 0
+    je .todosLosMrMActivos
+    
+    call crear_meeseek
+    jmp .saltar_idle
+
+    .todosLosMrMActivos:
+    mov eax, 0
+
+    .saltar_idle:
     mov dx, GDT_IDX_TSS_IDLE<<3
     mov [idle_selector], dx
     jmp far [idle_offset]
-    iret
+
+    pop eax
+    pop ebx
+    pop ecx
+    popad
+iret
 
 _isr89:
     mov eax, 0x59

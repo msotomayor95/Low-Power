@@ -61,5 +61,6 @@ uint32_t stack0[20];
 
 void tss_init(void);
 vaddr_t tss_task_init(uint32_t index, vaddr_t code_start, uint8_t x, uint8_t y);
+void tss_task_kill(uint32_t index);
 
 #endif //  __TSS_H__

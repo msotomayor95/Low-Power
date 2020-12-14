@@ -31,6 +31,22 @@ uint16_t sched_next_task(void) {
   return resultado;
 }
 
+uint8_t meeseek_llamo_crear_meeseek() {
+	return tarea_actual > 1? 1 : 0;
+}
+
+void matar_meeseek() {
+	uint32_t actual = tarea_actual - 2;
+	meeseeks[actual].vivo = 0;
+
+	actual % 2 == 0? cant_meeseeks_rick-- : cant_meeseeks_morty--;
+	tss_task_kill(actual);
+}
+
+uint8_t valores_validos(uint32_t x, uint32_t y, vaddr_t code_start) {
+	return (x < 80 && y < 50 && code_start >= 0x1D00000 && code_start <= 0x1D02000 )? 1 : 0;
+}
+
 uint8_t puedo_crear_meeseek() {
 	if (tarea_actual == 0 && cant_meeseeks_rick < 10) {
 		return 1;
@@ -44,12 +60,11 @@ uint8_t puedo_crear_meeseek() {
 uint32_t crear_meeseek(uint8_t x, uint8_t y, vaddr_t code_start) {
 	uint32_t i = tarea_actual == 0? 0 : 1;
 	while (i < 20 && meeseeks[i].vivo == 1) i+=2;
-
+	
 	meeseeks[i].vivo = 1;
 	meeseeks[i].x = x;
 	meeseeks[i].y = y;
 
-	
-
-	tss_task_init(i, code_start, x, y);
+	tarea_actual == 0? cant_meeseeks_rick++: cant_meeseeks_morty++;	
+	return tss_task_init(i, code_start, x, y);
 }

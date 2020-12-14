@@ -13,6 +13,7 @@
 #include "defines.h"
 #include "prng.h"
 #include "screen.h"
+#include "tss.h"
 #include "colors.h"
 
 typedef struct megaSemilla
@@ -39,6 +40,9 @@ int cant_meeseeks_morty;
 void sched_init();
 uint16_t sched_next_task();
 
+
+uint8_t meeseek_llamo_crear_meeseek();
+uint8_t valores_validos();
 uint8_t puedo_crear_meeseek();
 uint32_t crear_meeseek(uint8_t x, uint8_t y, uint32_t code_start);
 
