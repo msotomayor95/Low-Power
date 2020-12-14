@@ -13,7 +13,10 @@
 
 void mmu_init(void) {
 	NEXT_FREE_KERNEL_PAGE = FREE_KERNEL_SPACE;
-	
+  for (int i = 0; i < 10; ++i) {
+    vaddr_rick[i] = 1;
+    vaddr_morty[i] = 1;
+  }	
 }
 
 paddr_t mmu_next_free_kernel_page(void) {
@@ -132,4 +135,46 @@ void mmu_kernel_identity_mapping(pd_entry *pd, pt_entry *pt) {
 
  vaddr_t init_morty(void){
   return mmu_init_task_dir(PLAYER_MORTY, CODE_MORTY, TASK_PAGES, TASK_CODE_VIRTUAL, 0x1, 0x1);
+ }
+
+ vaddr_t init_meeseek(uint32_t index, vaddr_t code_start, uint8_t x, uint8_t y) {
+  uint32_t map_offset = 80*y*8*1024 + x*8*1024;
+  paddr_t map_dir = BASE_MAP + map_offset;        // 8 * 1024 = 2 paginas. 80*y*8*1024 + x*8*1024
+  uint32_t i = (uint32_t)index/2                  // el indice de meeseeks va de 0 a 19
+
+  if (index % 2 == 0) {
+    vaddr_rick[i] = 0;
+  }
+  else {
+    vaddr_morty[i] = 0;
+  }
+
+  uint32_t cr3 = rcr3();
+  0x8000000 + i * 0x2 * 0x1000
+
+  mmu_map_page(cr3, free_dir, map_dir, 0x1, 0x1);
+  mmu_map_page(cr3, free_dir + 0x1000, map_dir + 0x1000, 0x1, 0x1);
+  uint8_t* source = (uint8_t *) code_start;
+  uint8_t* destiny = (uint8_t *) free_dir;
+  for (i = 0; i < 0x1000 * 2; ++i) {
+     destiny[i] = source[i];
+  }
+
+
+   return free_dir;
+ }
+
+ void kill_meeseek(uint32_t index) {
+  uint32_t cr3 = rcr3();
+  uint32_t i = (uint32_t) index/2;
+  vaddr_t meeseek_start = 0x8000000 + i * 0x2 * 0x1000;
+  
+  mmu_unmap_page(cr3, meeseek_start);
+  mmu_unmap_page(cr3, meeseek_start + 0x1000);  
+  if (index % 2 == 0) {
+    vaddr_rick[i] = 1;
+  }
+  else {
+    vaddr_morty[vi] = 1;
+  }
  }

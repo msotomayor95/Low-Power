@@ -151,11 +151,16 @@ void tss_init() {
 		gdt[i].base_31_24 = (uint8_t)(((uint32_t)&tss_tasks[i])>>24);
 	}
 
+	for (int i = 0; i < 20; ++i) {
+		stack0[i] = mmu_next_free_kernel_page();
+	}
+
 }
 
-void tss_task_init(uint32_t index, vaddr_t code_start, uint8_t x, uint8_t y) { 
-	uint32_t map_offset = 80*y*8*1024 + x*8*1024;
-	paddr_t map_dir = BASE_MAP + map_offset;				// 8 * 1024 = 2 paginas. 80*y*8*1024 + x*8*1024
+vaddr_t tss_task_init(uint32_t index, vaddr_t code_start, uint8_t x, uint8_t y) { 
+	vaddr_t m_start = init_meeseek(index, code_start, uint8_t x, uint8_t y);	// creo la tarea, mapeando en memoria virtual lo necesario
+	gdt[index + FIRST_TSS].p = 1;												// activo el descriptor del tss correspondiente
+
 	uint32_t stack0_index = index;
 	index = index + BASE_TSS;
 	tss_tasks[index] = tss_tasks[index % 2];				// igualo la tss de la tarea que estoy creando al de su creador (rick = 0 o morty = 1)
@@ -165,9 +170,12 @@ void tss_task_init(uint32_t index, vaddr_t code_start, uint8_t x, uint8_t y) {
 	tss_tasks[index].esp0 = stack0[stack0_index] + 0x1000;
 
 	// dir virtual mapeada a la primera de las 2 paginas de la tarea
-	tss_tasks[index].eip = code_start; 
+	tss_tasks[index].eip = m_start; 
 	// dir virtual mapeada a la direccion de la segunda pagina de la tarea
-	tss_tasks[index].esp = code_start + 0x1000*0x2 ; // el final de la segunda pagina?
-	tss_tasks[index].ebp = code_start + 0x1000*0x2;
+	tss_tasks[index].esp = m_start + 0x1000*0x2; 
+	tss_tasks[index].ebp = m_start + 0x1000*0x2;
+
+
+	return m_start;
 }
 

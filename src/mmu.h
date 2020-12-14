@@ -57,5 +57,11 @@ vaddr_t init_rick(void);
 
 vaddr_t init_morty(void);
 
+vaddr_t init_meeseek(uint32_t index, vaddr_t code_start, uint8_t x, uint8_t y);
+
+void kill_meeseek(uint32_t index);
+
 paddr_t NEXT_FREE_KERNEL_PAGE;
+uint8_t vaddr_rick[10];
+uint8_t vaddr_morty[10];
 #endif //  __MMU_H__
