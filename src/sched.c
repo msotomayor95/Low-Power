@@ -49,8 +49,16 @@ void matar_meeseek() {
 	tss_task_kill(actual);
 }
 
-uint8_t valores_validos(uint32_t x, uint32_t y, vaddr_t code_start) {
-	return (x < 80 && y < 50 && code_start >= 0x1D00000 && code_start <= 0x1D02000 )? 1 : 0;
+uint8_t valores_validos(uint32_t code_start, uint32_t y, vaddr_t x) {
+	uint8_t x_valido = x < 80 ? 1:0;
+	uint8_t y_valido = y < 50 ? 1:0;
+	uint8_t code_start_valido = code_start >= 0x1D00000 && code_start <= 0x1D02000 ? 1:0;
+
+	if (x_valido == 1 && y_valido == 1 && code_start_valido == 1) {
+		return 1;
+	} else {
+		return 0;
+	}
 }
 
 uint8_t puedo_crear_meeseek() {

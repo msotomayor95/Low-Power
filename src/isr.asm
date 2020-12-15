@@ -107,12 +107,10 @@ ISR 31
 ;; -------------------------------------------------------------------------- ;;
 
 _isrClock:
-    xchg bx, bx
     pushad
     call pic_finish1
     call next_clock
     call sched_next_task
-    xchg bx, bx
     str dx
     cmp ax, dx
     je .fin
@@ -162,7 +160,7 @@ _isr88:
 
     call meeseek_llamo_crear_meeseek
     cmp al, 0
-    jne .checkeoValores
+    je .checkeoValores
     
     ; Si llegue aca es porque un Mr. M llamo a esta syscall, por lo que muere.
     call matar_meeseek
