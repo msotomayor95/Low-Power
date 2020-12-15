@@ -165,7 +165,7 @@ _isr88:
     jne .checkeoValores
     
     ; Si llegue aca es porque un Mr. M llamo a esta syscall, por lo que muere.
-    ;call matar_meeseek
+    call matar_meeseek
     jmp .saltar_idle
 
     .checkeoValores:
