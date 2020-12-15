@@ -107,12 +107,10 @@ ISR 31
 ;; -------------------------------------------------------------------------- ;;
 
 _isrClock:
-    xchg bx, bx
     pushad
     call pic_finish1
     call next_clock
     call sched_next_task
-    xchg bx, bx
     str dx
     cmp ax, dx
     je .fin
@@ -159,8 +157,8 @@ _isr88:
     push eax
     
     mov [resultado_temporal], eax
-
     call meeseek_llamo_crear_meeseek
+    xchg bx, bx
     cmp al, 0
     jne .checkeoValores
     
