@@ -19,9 +19,9 @@ void sched_init(void) {
 	tarea_actual = -1;
 	for (int i = 0; i < MAX_SEEDS; ++i) {
 		seed_array[i].x = (uint8_t)(rand() % 80);
-		seed_array[i].y = (uint8_t)(rand() % 40);
+		seed_array[i].y = (uint8_t)(rand() % 40) + 1;
 		seed_array[i].found = 0;
-		screen_draw_box (seed_array[i].y, seed_array[i].x, 1, 1, 83, C_FG_BROWN + C_BG_GREEN);
+		print("S",seed_array[i].x, seed_array[i].y, C_FG_LIGHT_BROWN + C_BG_GREEN);
 		// sembrar_megasemilla(seed_array[i].y, seed_array[i].x, 1, 1,)
 	}
 	
@@ -51,7 +51,7 @@ void matar_meeseek() {
 
 uint8_t valores_validos(uint32_t code_start, uint32_t y, vaddr_t x) {
 	uint8_t x_valido = x < 80 ? 1:0;
-	uint8_t y_valido = y < 50 ? 1:0;
+	uint8_t y_valido = 0 < y && y <= 40 ? 1:0;
 	uint8_t code_start_valido = code_start >= 0x1D00000 && code_start <= 0x1D02000 ? 1:0;
 
 	if (x_valido == 1 && y_valido == 1 && code_start_valido == 1) {
@@ -81,7 +81,7 @@ uint32_t crear_meeseek(uint8_t x, uint8_t y, vaddr_t code_start) {
 		if (tarea_actual == 0) {
 			puntaje_rick +=425;
 		} else {
-			puntaje_morty+=425;
+			puntaje_morty +=425;
 		}
 		seed_array[j].found = 1;
 
@@ -103,7 +103,6 @@ uint32_t crear_meeseek(uint8_t x, uint8_t y, vaddr_t code_start) {
 
 	tarea_actual == 0? cant_meeseeks_rick++: cant_meeseeks_morty++;	
 	uint32_t resultado = tss_task_init(i, code_start, x, y);
-	breakpoint();
 	return resultado;
 }
 
@@ -143,7 +142,8 @@ void actualizar_pantalla(){
 	// Dibujo semillas no encontradas
 	for (int i = 0; i < MAX_SEEDS; i++) {
 		if (seed_array[i].found == 0) {
-			screen_draw_box (seed_array[i].y, seed_array[i].x, 1, 1, 83, C_FG_BROWN + C_BG_GREEN);
+			print("S",seed_array[i].x, seed_array[i].y, C_FG_LIGHT_BROWN + C_BG_GREEN);
+			// print("S", 1, 0, C_FG_LIGHT_BROWN + C_BG_GREEN);
 		}
 	}
 
@@ -151,7 +151,7 @@ void actualizar_pantalla(){
 	for (int i = 0; i < 20; i++) {
 		if (meeseeks[i].vivo == 1) {
 			uint16_t color = i % 2 == 0? C_FG_RED: C_FG_BLUE;
-			screen_draw_box (meeseeks[i].y, meeseeks[i].x, 1, 1, 83, color + C_BG_GREEN);
+			print("K",meeseeks[i].x, meeseeks[i].y, color + C_BG_GREEN);
 		}
 	}
 
