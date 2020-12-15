@@ -120,17 +120,17 @@ void tss_init() {
 	tss_tasks[1].ebp = 0x1D04000;
 	tss_tasks[1].esi = 0;
 	tss_tasks[1].edi = 0;
-	tss_tasks[1].es = GDT_IDX_DATA_3<<3 | 3;
+	tss_tasks[1].es = (GDT_IDX_DATA_3<<3) | 3;
 	tss_tasks[1].unused4 = 0;
-	tss_tasks[1].cs = GDT_IDX_CODE_3<<3 | 3;
+	tss_tasks[1].cs = (GDT_IDX_CODE_3<<3) | 3;
 	tss_tasks[1].unused5 = 0;
-	tss_tasks[1].ss = GDT_IDX_DATA_3<<3 | 3;
+	tss_tasks[1].ss = (GDT_IDX_DATA_3<<3) | 3;
 	tss_tasks[1].unused6 = 0;
-	tss_tasks[1].ds = GDT_IDX_DATA_3<<3 | 3;
+	tss_tasks[1].ds = (GDT_IDX_DATA_3<<3) | 3;
 	tss_tasks[1].unused7 = 0;
-	tss_tasks[1].fs = GDT_IDX_DATA_3<<3 | 3;
+	tss_tasks[1].fs = (GDT_IDX_DATA_3<<3) | 3;
 	tss_tasks[1].unused8 = 0;
-	tss_tasks[1].gs = GDT_IDX_DATA_3<<3 | 3;
+	tss_tasks[1].gs = (GDT_IDX_DATA_3<<3) | 3;
 	tss_tasks[1].unused9 = 0;
 	tss_tasks[1].ldt = 0;
 	tss_tasks[1].unused10 = 0;
@@ -164,6 +164,7 @@ vaddr_t tss_task_init(uint32_t index, vaddr_t code_start, uint8_t x, uint8_t y) 
 	uint32_t stack0_index = index;
 	index = index + BASE_TSS;
 	tss_tasks[index] = tss_tasks[index % 2];	// igualo la tss de la tarea que estoy creando al de su creador (rick = 0 o morty = 1)
+	tss_tasks[index].cs = (GDT_IDX_CODE_3 << 3) | 3;
 
 	// solo hay unos campos que difieren del meeseek con su creador
 	// selecciono una pagina de 20 que tenia previamente inicializadas

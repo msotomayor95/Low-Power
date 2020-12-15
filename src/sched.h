@@ -50,5 +50,6 @@ uint8_t puedo_crear_meeseek();
 uint32_t crear_meeseek(uint8_t x, uint8_t y, uint32_t code_start);
 uint8_t todas_las_semillas_encontradas();
 void sentenciar_ganador(uint8_t por_excepcion);
+void actualizar_pantalla();
 
 #endif //  __SCHED_H__

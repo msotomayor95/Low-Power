@@ -180,7 +180,6 @@ modoprotegido:
     sti
 
     ; Saltar a la primera tarea: Idle
-    xchg bx, bx
     .antesDelJumPFar:
     mov ax, GDT_IDX_TSS_IDLE<<3
     mov [selector], ax

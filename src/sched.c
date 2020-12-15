@@ -16,12 +16,13 @@ void sched_init(void) {
 	cant_meeseeks_morty = 0;
 	puntaje_morty = 0;
 
-	tarea_actual = 0;
+	tarea_actual = -1;
 	for (int i = 0; i < MAX_SEEDS; ++i) {
 		seed_array[i].x = (uint8_t)(rand() % 80);
 		seed_array[i].y = (uint8_t)(rand() % 40);
 		seed_array[i].found = 0;
 		screen_draw_box (seed_array[i].y, seed_array[i].x, 1, 1, 83, C_FG_BROWN + C_BG_GREEN);
+		// sembrar_megasemilla(seed_array[i].y, seed_array[i].x, 1, 1,)
 	}
 	
 	for (int i = 0; i < 20; ++i) {
@@ -32,6 +33,7 @@ void sched_init(void) {
 uint16_t sched_next_task(void) {
   tarea_actual = (tarea_actual + 1) % 2;
   uint16_t resultado = ((tarea_actual + FIRST_TSS) << 3);
+  actualizar_pantalla();
   return resultado;
 }
 
@@ -69,9 +71,9 @@ uint32_t crear_meeseek(uint8_t x, uint8_t y, vaddr_t code_start) {
 	
 	if (j < MAX_SEEDS && seed_array[j].found == 0) {
 		if (tarea_actual == 0) {
-			puntaje_rick +=5;
+			puntaje_rick +=425;
 		} else {
-			puntaje_morty+=5;
+			puntaje_morty+=425;
 		}
 		seed_array[j].found = 1;
 
@@ -92,7 +94,9 @@ uint32_t crear_meeseek(uint8_t x, uint8_t y, vaddr_t code_start) {
 	meeseeks[i].y = y;
 
 	tarea_actual == 0? cant_meeseeks_rick++: cant_meeseeks_morty++;	
-	return tss_task_init(i, code_start, x, y);
+	uint32_t resultado = tss_task_init(i, code_start, x, y);
+	breakpoint();
+	return resultado;
 }
 
 uint8_t todas_las_semillas_encontradas() {
@@ -114,4 +118,33 @@ void sentenciar_ganador(uint8_t por_excepcion) {
 		char* win_text = tarea_actual == 0? "Gano Morty":"Gano Rick";
 		print(win_text, 0, 0, 0xF);
 	}
+}
+
+void actualizar_pantalla(){
+	// Base mapa.
+	screen_draw_box (1, 0, 40, 80, 255, C_BG_GREEN);
+	
+	// puntuacion Rick
+	// screen_draw_box (43, 5, 3, 10, 255, C_BG_RED);
+	print_dec(puntaje_rick, 7, 5, 43, C_FG_WHITE + C_BG_RED);
+
+	// puntuacion Morty
+	// screen_draw_box (43, 65, 3, 10, 255, C_BG_BLUE);
+	print_dec(puntaje_morty, 7, 65, 43, C_FG_WHITE + C_BG_BLUE);
+
+	// Dibujo semillas no encontradas
+	for (int i = 0; i < MAX_SEEDS; i++) {
+		if (seed_array[i].found == 0) {
+			screen_draw_box (seed_array[i].y, seed_array[i].x, 1, 1, 83, C_FG_BROWN + C_BG_GREEN);
+		}
+	}
+
+	// Dibujo meeseeks vivos
+	for (int i = 0; i < 20; i++) {
+		if (meeseeks[i].vivo == 1) {
+			uint16_t color = i % 2 == 0? C_FG_RED: C_FG_BLUE;
+			screen_draw_box (meeseeks[i].y, meeseeks[i].x, 1, 1, 83, color + C_BG_GREEN);
+		}
+	}
+
 }
