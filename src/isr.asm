@@ -160,7 +160,7 @@ _isr88:
     call meeseek_llamo_crear_meeseek
     xchg bx, bx
     cmp al, 0
-    jne .checkeoValores
+    je .checkeoValores
     
     ; Si llegue aca es porque un Mr. M llamo a esta syscall, por lo que muere.
     call matar_meeseek
