@@ -25,14 +25,17 @@
 // X Columnas
 #define SIZE_M 80
 
-//tamanio de una tss
+// tamanio de una tss
 #define SIZE_TSS 0x68
 
-//first tss descriptor
+// first tss descriptor
 #define FIRST_TSS 17
 
-//tss array base
+// tss array base
 #define BASE_TSS 2
+
+// Maxima cantidad de semillas
+#define MAX_SEEDS 40
 
 /* Indices en la gdt */
 /* -------------------------------------------------------------------------- */

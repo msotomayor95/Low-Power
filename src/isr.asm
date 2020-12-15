@@ -26,6 +26,7 @@ extern matar_meeseek
 extern valores_validos
 extern puedo_crear_meeseek
 extern crear_meeseek
+extern sentenciar_ganador
 extern sched_next_task
 
 %define GDT_IDX_TSS_IDLE 16
@@ -143,6 +144,8 @@ _isrKey:
 ;; Rutinas de atención de las SYSCALLS
 ;; -------------------------------------------------------------------------- ;;
 
+resultado_temporal: dd 0x0
+
 _isr88:
     ; eax = code_start
     ; ebx = x
@@ -153,6 +156,8 @@ _isr88:
     push ebx
     push eax
     
+    mov [resultado_temporal], eax
+
     call meeseek_llamo_crear_meeseek
     cmp al, 0
     jne .checkeoValores
@@ -165,6 +170,11 @@ _isr88:
     call valores_validos
     cmp al, 1
     je .checkeoSiHayEspacioParaUnNuevoMrM
+    
+    ; Rick o Morty llamaron a la syscall con datos invalidos.
+    xor eax, eax
+    push eax
+    call sentenciar_ganador
     jmp $
     
     .checkeoSiHayEspacioParaUnNuevoMrM:
@@ -172,11 +182,13 @@ _isr88:
     cmp al, 0
     je .todosLosMrMActivos
     
+    ; Existe espacio para crear un Mr. M
     call crear_meeseek
+    mov [resultado_temporal], eax
     jmp .saltar_idle
 
     .todosLosMrMActivos:
-    mov eax, 0
+    mov DWORD [resultado_temporal], 0
 
     .saltar_idle:
     mov dx, GDT_IDX_TSS_IDLE<<3
@@ -187,6 +199,7 @@ _isr88:
     pop ebx
     pop ecx
     popad
+    mov eax, [resultado_temporal]
 iret
 
 _isr89:
