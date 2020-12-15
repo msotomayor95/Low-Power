@@ -16,8 +16,8 @@ tss_t tss_initial = {0};
 tss_t tss_idle = {
 	.ptl = 0,
   	.unused0 = 0,
-	.esp0 = 0,
-	.ss0 = 0,
+	.esp0 = 0x25000,
+	.ss0 = GDT_IDX_DATA_0 << 3,
 	.unused1 = 0,
 	.esp1 = 0,
 	.ss1 = 0,
@@ -53,7 +53,6 @@ tss_t tss_idle = {
 	.dtrap = 0,
 	.iomap = 0
 };
-
 
 
 void tss_init() {
@@ -116,21 +115,21 @@ void tss_init() {
 	tss_tasks[1].ecx = 0;
 	tss_tasks[1].edx = 0;
 	tss_tasks[1].ebx = 0;
-	tss_tasks[1].esp = 0x1D04000;
-	tss_tasks[1].ebp = 0x1D04000;
+	tss_tasks[1].esp = TASK_CODE_VIRTUAL + 0x4000;
+	tss_tasks[1].ebp = TASK_CODE_VIRTUAL + 0x4000;
 	tss_tasks[1].esi = 0;
 	tss_tasks[1].edi = 0;
-	tss_tasks[1].es = (GDT_IDX_DATA_3<<3) | 3;
+	tss_tasks[1].es = GDT_IDX_DATA_3<<3 | 3;
 	tss_tasks[1].unused4 = 0;
-	tss_tasks[1].cs = (GDT_IDX_CODE_3<<3) | 3;
+	tss_tasks[1].cs = GDT_IDX_CODE_3<<3 | 3;
 	tss_tasks[1].unused5 = 0;
-	tss_tasks[1].ss = (GDT_IDX_DATA_3<<3) | 3;
+	tss_tasks[1].ss = GDT_IDX_DATA_3<<3 | 3;
 	tss_tasks[1].unused6 = 0;
-	tss_tasks[1].ds = (GDT_IDX_DATA_3<<3) | 3;
+	tss_tasks[1].ds = GDT_IDX_DATA_3<<3 | 3;
 	tss_tasks[1].unused7 = 0;
-	tss_tasks[1].fs = (GDT_IDX_DATA_3<<3) | 3;
+	tss_tasks[1].fs = GDT_IDX_DATA_3<<3 | 3;
 	tss_tasks[1].unused8 = 0;
-	tss_tasks[1].gs = (GDT_IDX_DATA_3<<3) | 3;
+	tss_tasks[1].gs = GDT_IDX_DATA_3<<3 | 3;
 	tss_tasks[1].unused9 = 0;
 	tss_tasks[1].ldt = 0;
 	tss_tasks[1].unused10 = 0;
@@ -146,9 +145,9 @@ void tss_init() {
 	gdt[GDT_IDX_TSS_IDLE].base_31_24 = (uint8_t)(((uint32_t)&tss_idle)>>24);
 
 	for (int i = GDT_IDX_TSS_RICK; i < GDT_COUNT; ++i) {
-		gdt[i].base_15_0 = (uint16_t)((uint32_t)&tss_tasks[i]);
-		gdt[i].base_23_16 = (uint8_t)(((uint32_t)&tss_tasks[i])>>16);
-		gdt[i].base_31_24 = (uint8_t)(((uint32_t)&tss_tasks[i])>>24);
+		gdt[i].base_15_0 = (uint16_t)((uint32_t)&tss_tasks[i - GDT_IDX_TSS_RICK]);
+		gdt[i].base_23_16 = (uint8_t)(((uint32_t)&tss_tasks[i - GDT_IDX_TSS_RICK])>>16);
+		gdt[i].base_31_24 = (uint8_t)(((uint32_t)&tss_tasks[i - GDT_IDX_TSS_RICK])>>24);
 	}
 
 	for (int i = 0; i < 20; ++i) {
@@ -159,7 +158,6 @@ void tss_init() {
 
 vaddr_t tss_task_init(uint32_t index, vaddr_t code_start, uint8_t x, uint8_t y) { 
 	vaddr_t m_start = init_meeseek(index, code_start, x, y);	// creo la tarea, mapeando en memoria virtual lo necesario
-	gdt[index + FIRST_TSS].p = 1;								// activo el descriptor del tss correspondiente
 
 	uint32_t stack0_index = index;
 	index = index + BASE_TSS;
@@ -176,10 +174,11 @@ vaddr_t tss_task_init(uint32_t index, vaddr_t code_start, uint8_t x, uint8_t y) 
 	tss_tasks[index].esp = m_start + 0x1000*0x2; 
 	tss_tasks[index].ebp = m_start + 0x1000*0x2;
 
+	gdt[index + FIRST_TSS].p = 1;								// activo el descriptor del tss correspondiente
 	return m_start;
 }
 
 void tss_task_kill(uint32_t index) {
-	gdt[(index+2) + FIRST_TSS].p = 1;
+	gdt[(index+2) + FIRST_TSS].p = 0;
 	kill_meeseek(index);
 }
