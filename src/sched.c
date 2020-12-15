@@ -134,11 +134,11 @@ void actualizar_pantalla(){
 	
 	// puntuacion Rick
 	// screen_draw_box (43, 5, 3, 10, 255, C_BG_RED);
-	print_dec(puntaje_rick, 7, 5, 43, C_FG_WHITE + C_BG_RED);
+	print_dec(puntaje_rick, 8, 6, 44, C_FG_WHITE + C_BG_RED);
 
 	// puntuacion Morty
 	// screen_draw_box (43, 65, 3, 10, 255, C_BG_BLUE);
-	print_dec(puntaje_morty, 7, 65, 43, C_FG_WHITE + C_BG_BLUE);
+	print_dec(puntaje_morty, 8, 66, 44, C_FG_WHITE + C_BG_BLUE);
 
 	// Dibujo semillas no encontradas
 	for (int i = 0; i < MAX_SEEDS; i++) {
