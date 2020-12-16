@@ -9,6 +9,9 @@
 #include "sched.h"
 
 
+seed_t seed_array[MAX_SEEDS];
+mr_meeseek_t meeseeks[20];
+
 void sched_init(void) {
 	cant_meeseeks_rick = 0;
 	puntaje_rick = 0;
@@ -22,19 +25,35 @@ void sched_init(void) {
 		seed_array[i].y = (uint8_t)(rand() % 40) + 1;
 		seed_array[i].found = 0;
 		print("S",seed_array[i].x, seed_array[i].y, C_FG_LIGHT_BROWN + C_BG_GREEN);
-		// sembrar_megasemilla(seed_array[i].y, seed_array[i].x, 1, 1,)
 	}
 	
 	for (int i = 0; i < 20; ++i) {
+		meeseeks[i].x = 255;
+		meeseeks[i].y = 255;
 		meeseeks[i].vivo = 0;
 	}
 }
 
 uint16_t sched_next_task(void) {
-  tarea_actual = (tarea_actual + 1) % 2;
-  uint16_t resultado = ((tarea_actual + FIRST_TSS) << 3);
-  actualizar_pantalla();
-  return resultado;
+	tarea_actual = (tarea_actual + 1) % 22;
+	if (tarea_actual > 1) { // La siguiente tarea a ejecutar puede ser un Mr. Meeseek.
+		int i = tarea_actual-2;
+		while (i < 20){
+			if (meeseeks[i].vivo == 1){
+				break;
+			}
+			i++;
+		}
+		if (i < 20) {
+			tarea_actual = i+2;
+		} else {
+			tarea_actual = 0;
+		}
+	}
+	uint16_t resultado = ((tarea_actual + FIRST_TSS) << 3);
+	actualizar_pantalla();
+	print_dec(tarea_actual, 2, 0, 0, 0xF);
+	return resultado;
 }
 
 uint8_t meeseek_llamo_crear_meeseek() {
@@ -49,7 +68,8 @@ void matar_meeseek() {
 	tss_task_kill(actual);
 }
 
-uint8_t valores_validos(uint32_t code_start, uint32_t y, vaddr_t x) {
+uint8_t valores_validos(uint32_t code_start, uint32_t x, vaddr_t y) {
+
 	uint8_t x_valido = x < 80 ? 1:0;
 	uint8_t y_valido = 0 < y && y <= 40 ? 1:0;
 	uint8_t code_start_valido = code_start >= 0x1D00000 && code_start <= 0x1D02000 ? 1:0;
@@ -71,7 +91,7 @@ uint8_t puedo_crear_meeseek() {
 	}
 }
 
-uint32_t crear_meeseek(uint8_t x, uint8_t y, vaddr_t code_start) {
+uint32_t crear_meeseek(vaddr_t code_start, uint8_t x, uint8_t y) {
 	uint32_t i = tarea_actual == 0? 0 : 1;
 	uint32_t j = 0;
 

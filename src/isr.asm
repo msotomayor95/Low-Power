@@ -52,17 +52,26 @@ _isr%1:
     pushad
     mov eax, %1
     str dx
+    
     cmp dx, GDT_IDX_TSS_RICK <<3
-    je .ganoMorty
+    je .ganoElOtroJugador
+
     cmp dx, GDT_IDX_TSS_MORTY <<3
-    je .ganoRick
+    jne .NoEsUnJugador
+
+    .ganoElOtroJugador:
+    mov eax, 1
+    push eax
+    call sentenciar_ganador
+    jmp $
+
+    ; No es ni Rick ni Morty, debe ser un Mr. Meeseek
+    .NoEsUnJugador:
+
+    call matar_meeseek
     call sched_next_task
     mov [sched_task_selector], ax
     jmp far [sched_task_offset]
-    .ganoMorty:
-        jmp $
-    .ganoRick:
-        jmp $    
     popad
 
 %endmacro
@@ -111,6 +120,7 @@ _isrClock:
     call pic_finish1
     call next_clock
     call sched_next_task
+    xchg bx, bx
     str dx
     cmp ax, dx
     je .fin
@@ -172,7 +182,6 @@ _isr88:
     
     ; Rick o Morty llamaron a la syscall con datos invalidos.
     xor eax, eax
-    push eax
     call sentenciar_ganador
     jmp $
     
@@ -182,6 +191,8 @@ _isr88:
     je .todosLosMrMActivos
     
     ; Existe espacio para crear un Mr. M
+    pop eax
+    push eax
     call crear_meeseek
     mov [resultado_temporal], eax
     jmp .saltar_idle
