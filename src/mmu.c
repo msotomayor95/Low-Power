@@ -182,6 +182,41 @@ vaddr_t init_meeseek(uint32_t index, vaddr_t code_start, uint8_t x, uint8_t y)
 	return free_dir;
 }
 
+void mover_codigo_meeseek(uint32_t index, uint8_t x, uint8_t y) {
+	uint32_t map_offset = 80 * y * 8 * 1024 + x * 8 * 1024;
+	uint32_t map_dir = BASE_MAP + map_offset;
+	uint32_t i = (uint32_t)index / 2;		 // el indice de meeseeks va de 0 a 19
+
+	if (index % 2 == 0) {
+		vaddr_rick[i] = 0;
+	}
+	else {
+		vaddr_morty[i] = 0;
+	}
+
+	uint32_t cr3 = rcr3();
+	mmu_map_page(cr3, map_dir, map_dir, 0x1, 0x1);  // mapeo provisional para copiar el codigo del meeseek
+	mmu_map_page(cr3, map_dir + 0x1000, map_dir + 0x1000, 0x1, 0x1);
+	
+	uint32_t virtual_start = 0x8000000 + i * 0x2 * 0x1000;
+
+	uint8_t* source = (uint8_t *) virtual_start;
+	uint8_t* destiny = (uint8_t *) map_dir;
+	
+	for (int j = 0; j < 0x1000 * 2; j++){
+		destiny[j] = source[j];				// se copia el codigo del Mr M en el nuevo lugar del mapa
+	}
+	mmu_unmap_page(cr3, map_dir);			// se desmapea el mapeo provisorio.
+	mmu_unmap_page(cr3, map_dir + 0x1000);
+
+	mmu_unmap_page(cr3, virtual_start);		// se desmapea la direccion que dirigue al antoguo (x, y).
+	mmu_unmap_page(cr3, virtual_start + 0x1000);
+
+	mmu_map_page(cr3, virtual_start, map_dir, 0x1, 0x1);
+	mmu_map_page(cr3, virtual_start + 0x1000, map_dir + 0x1000, 0x1, 0x1);
+	
+}
+
 void kill_meeseek(uint32_t index)
 {
 	uint32_t cr3 = rcr3();

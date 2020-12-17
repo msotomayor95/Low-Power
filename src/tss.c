@@ -9,8 +9,6 @@
 #include "tss.h"
 #include "defines.h"
 #include "kassert.h"
-#include "mmu.h"
-
 
 tss_t tss_initial = {0};
 tss_t tss_idle = {

@@ -59,6 +59,8 @@ vaddr_t init_morty(void);
 
 vaddr_t init_meeseek(uint32_t index, vaddr_t code_start, uint8_t x, uint8_t y);
 
+void mover_codigo_meeseek(uint32_t index, uint8_t x, uint8_t y);
+
 void kill_meeseek(uint32_t index);
 
 paddr_t NEXT_FREE_KERNEL_PAGE;

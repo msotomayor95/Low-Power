@@ -26,6 +26,7 @@ extern matar_meeseek
 extern valores_validos
 extern puedo_crear_meeseek
 extern crear_meeseek
+extern mover_meeseek
 extern sentenciar_ganador
 extern sched_next_task
 
@@ -226,11 +227,38 @@ _isr100:
     jmp far [idle_offset]
     iret
 
+result: dd 0x0
+
 _isr123:
-    mov eax, 0x7b
+    pushad
+
+    str dx
+    cmp dx, GDT_IDX_TSS_RICK << 3
+    je .jugadorNoPuedeLLamarSyscall
+    cmp dx, GDT_IDX_TSS_MORTY << 3
+    jne .meeseekLlamoSyscall
+
+    .jugadorNoPuedeLLamarSyscall:
+    mov eax, 1
+    push eax
+    call sentenciar_ganador
+    jmp $
+
+    .meeseekLlamoSyscall:
+    push ebx
+    push eax
+
+    call mover_meeseek
+    mov [result], eax
     mov dx, GDT_IDX_TSS_IDLE<<3
     mov [idle_selector], dx
     jmp far [idle_offset]
+    
+    pop eax
+    pop ebx
+
+    popad
+    mov eax, [result]
     iret
 
 ;; Funciones Auxiliares

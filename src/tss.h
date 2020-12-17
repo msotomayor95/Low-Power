@@ -12,6 +12,7 @@
 #include "gdt.h"
 #include "types.h"
 #include "i386.h"
+#include "mmu.h"
 
 typedef struct str_tss {
   uint16_t ptl;

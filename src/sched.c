@@ -11,6 +11,11 @@
 
 seed_t seed_array[MAX_SEEDS];
 mr_meeseek_t meeseeks[20];
+uint8_t ticks_reloj[20]; 				// Se usara para checkear si tengo que reducir la distancia maxima del meeseek.
+
+uint32_t abs(int n){
+	return n<0? -n:n;
+}
 
 void sched_init(void) {
 	cant_meeseeks_rick = 0;
@@ -22,15 +27,18 @@ void sched_init(void) {
 	tarea_actual = -1;
 	for (int i = 0; i < MAX_SEEDS; ++i) {
 		seed_array[i].x = (uint8_t)(rand() % 80);
-		seed_array[i].y = (uint8_t)(rand() % 40) + 1;
+		seed_array[i].y = (uint8_t)(rand() % 40);
 		seed_array[i].found = 0;
-		print("S",seed_array[i].x, seed_array[i].y, C_FG_LIGHT_BROWN + C_BG_GREEN);
+		print("S",seed_array[i].x, seed_array[i].y + 1, C_FG_LIGHT_BROWN + C_BG_GREEN);
 	}
 	
 	for (int i = 0; i < 20; ++i) {
 		meeseeks[i].x = 255;
 		meeseeks[i].y = 255;
 		meeseeks[i].vivo = 0;
+		meeseeks[i].dist_max = 0;
+
+		ticks_reloj[i] = 0;
 	}
 }
 
@@ -45,6 +53,7 @@ uint16_t sched_next_task(void) {
 			i++;
 		}
 		if (i < 20) {
+			reducir_dist_maxima(i);
 			tarea_actual = i+2;
 		} else {
 			tarea_actual = 0;
@@ -71,7 +80,7 @@ void matar_meeseek() {
 uint8_t valores_validos(uint32_t code_start, uint32_t x, vaddr_t y) {
 
 	uint8_t x_valido = x < 80 ? 1:0;
-	uint8_t y_valido = 0 < y && y <= 40 ? 1:0;
+	uint8_t y_valido = y < 40 ? 1:0;
 	uint8_t code_start_valido = code_start >= 0x1D00000 && code_start <= 0x1D02000 ? 1:0;
 
 	if (x_valido == 1 && y_valido == 1 && code_start_valido == 1) {
@@ -91,6 +100,26 @@ uint8_t puedo_crear_meeseek() {
 	}
 }
 
+void reducir_dist_maxima(uint8_t index) {
+	ticks_reloj[index]--;
+
+	if (ticks_reloj[index] == 0){
+		if (meeseeks[index].dist_max > 1) {
+			meeseeks[index].dist_max--;
+		}
+		ticks_reloj[index] = 2;
+	}
+}
+
+void asimilar_semilla(uint8_t i){
+	seed_array[i].found = 1;
+	if (tarea_actual % 2 == 0) {
+		puntaje_rick += 425;
+	} else {
+		puntaje_morty += 425;
+	}
+}
+
 uint32_t crear_meeseek(vaddr_t code_start, uint8_t x, uint8_t y) {
 	uint32_t i = tarea_actual == 0? 0 : 1;
 	uint32_t j = 0;
@@ -98,12 +127,7 @@ uint32_t crear_meeseek(vaddr_t code_start, uint8_t x, uint8_t y) {
 	while (j < MAX_SEEDS && (seed_array[j].x != x || seed_array[j].y !=y)) j++;
 	
 	if (j < MAX_SEEDS && seed_array[j].found == 0) {
-		if (tarea_actual == 0) {
-			puntaje_rick +=425;
-		} else {
-			puntaje_morty +=425;
-		}
-		seed_array[j].found = 1;
+		asimilar_semilla(j);
 
 		if(todas_las_semillas_encontradas() == 1) {
 			sentenciar_ganador(0);
@@ -118,8 +142,11 @@ uint32_t crear_meeseek(vaddr_t code_start, uint8_t x, uint8_t y) {
 	while (i < 20 && meeseeks[i].vivo == 1) i+=2;
 	
 	meeseeks[i].vivo = 1;
+	meeseeks[i].dist_max = 7;
 	meeseeks[i].x = x;
 	meeseeks[i].y = y;
+
+	ticks_reloj[i] = 2;
 
 	tarea_actual == 0? cant_meeseeks_rick++: cant_meeseeks_morty++;	
 	uint32_t resultado = tss_task_init(i, code_start, x, y);
@@ -162,8 +189,7 @@ void actualizar_pantalla(){
 	// Dibujo semillas no encontradas
 	for (int i = 0; i < MAX_SEEDS; i++) {
 		if (seed_array[i].found == 0) {
-			print("S",seed_array[i].x, seed_array[i].y, C_FG_LIGHT_BROWN + C_BG_GREEN);
-			// print("S", 1, 0, C_FG_LIGHT_BROWN + C_BG_GREEN);
+			print("S",seed_array[i].x, seed_array[i].y+1, C_FG_LIGHT_BROWN + C_BG_GREEN);
 		}
 	}
 
@@ -171,8 +197,42 @@ void actualizar_pantalla(){
 	for (int i = 0; i < 20; i++) {
 		if (meeseeks[i].vivo == 1) {
 			uint16_t color = i % 2 == 0? C_FG_RED: C_FG_BLUE;
-			print("K",meeseeks[i].x, meeseeks[i].y, color + C_BG_GREEN);
+			print("K",meeseeks[i].x, meeseeks[i].y+1, color + C_BG_GREEN);
 		}
 	}
 
+}
+
+uint32_t mover_meeseek(int x, int y) {
+
+	uint8_t dist = abs(x) + abs(y);
+	if (meeseeks[tarea_actual-2].dist_max < dist) {
+		return 0;
+	}
+
+	int nuevo_x = (meeseeks[tarea_actual-2].x + x) % 80;
+	int nuevo_y = (meeseeks[tarea_actual-2].y + y) % 40;
+
+	if (nuevo_x < 0) {
+		nuevo_x = 80 + nuevo_x;
+	}
+
+	if (nuevo_y < 0) {
+		nuevo_y = 40 + nuevo_y;
+	}
+
+	int i = 0;
+	while (i < MAX_SEEDS) {
+		if (seed_array[i].found == 0 && seed_array[i].x == nuevo_x && seed_array[i].y == nuevo_y) {
+			asimilar_semilla(i);
+			matar_meeseek();
+			return 1;
+		}
+		i++;
+	}
+
+	mover_codigo_meeseek(tarea_actual-2, nuevo_x, nuevo_y);
+	meeseeks[tarea_actual-2].x = (uint8_t) nuevo_x;
+	meeseeks[tarea_actual-2].y = (uint8_t) nuevo_y;
+	return 1;
 }
