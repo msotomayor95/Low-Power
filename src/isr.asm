@@ -158,7 +158,6 @@ _isr88:
     
     mov [resultado_temporal], eax
     call meeseek_llamo_crear_meeseek
-    xchg bx, bx
     cmp al, 0
     je .checkeoValores
     
