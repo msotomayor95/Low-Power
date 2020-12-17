@@ -65,7 +65,7 @@ void matar_meeseek() {
 	meeseeks[actual].vivo = 0;
 
 	actual % 2 == 0? cant_meeseeks_rick-- : cant_meeseeks_morty--;
-	tss_task_kill(actual);
+	tss_task_kill(tarea_actual);
 }
 
 uint8_t valores_validos(uint32_t code_start, uint32_t x, vaddr_t y) {

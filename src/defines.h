@@ -31,11 +31,19 @@
 // first tss descriptor
 #define FIRST_TSS 17
 
+//first gdt meeseek
+#define GDT_FIRST_MEESEEK 19
+
 // tss array base
-#define BASE_TSS 2
+#define BASE_TSS_TASKS_MEESEEKS 2
 
 // Maxima cantidad de semillas
 #define MAX_SEEDS 40
+
+// asd
+#define MMU_FLAG_PRESENT (0x1)
+#define MMU_FLAG_SUPERVISOR (0x0)
+#define MMU_FLAG_READWRITE (0x1)
 
 /* Indices en la gdt */
 /* -------------------------------------------------------------------------- */
@@ -115,8 +123,6 @@
 
 #define FREE_KERNEL_SPACE (0x100000)
 
-#define MMU_FLAG_PRESENT (0x1)
-#define MMU_FLAG_SUPERVISOR (0x0)
-#define MMU_FLAG_READWRITE (0x1)
+
 
 #endif //  __DEFINES_H__

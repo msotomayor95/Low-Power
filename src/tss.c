@@ -150,6 +150,7 @@ void tss_init() {
 		gdt[i].base_31_24 = (uint8_t)(((uint32_t)&tss_tasks[i - GDT_IDX_TSS_RICK])>>24);
 	}
 
+
 	for (int i = 0; i < 20; ++i) {
 		stack0[i] = mmu_next_free_kernel_page();
 	}
@@ -160,7 +161,7 @@ vaddr_t tss_task_init(uint32_t index, vaddr_t code_start, uint8_t x, uint8_t y) 
 	vaddr_t m_start = init_meeseek(index, code_start, x, y);	// creo la tarea, mapeando en memoria virtual lo necesario
 
 	uint32_t stack0_index = index;
-	index = index + BASE_TSS;
+	index = index + BASE_TSS_TASKS_MEESEEKS;
 	tss_tasks[index] = tss_tasks[index % 2];	// igualo la tss de la tarea que estoy creando al de su creador (rick = 0 o morty = 1)
 	tss_tasks[index].cs = (GDT_IDX_CODE_3 << 3) | 3;
 
@@ -174,11 +175,11 @@ vaddr_t tss_task_init(uint32_t index, vaddr_t code_start, uint8_t x, uint8_t y) 
 	tss_tasks[index].esp = m_start + 0x1000*0x2; 
 	tss_tasks[index].ebp = m_start + 0x1000*0x2;
 
-	gdt[index + FIRST_TSS].p = 1;								// activo el descriptor del tss correspondiente
+	gdt[index + GDT_FIRST_MEESEEK].p = 1;								// activo el descriptor del tss correspondiente
 	return m_start;
 }
 
 void tss_task_kill(uint32_t index) {
-	gdt[(index+2) + FIRST_TSS].p = 0;
+	gdt[index + GDT_FIRST_MEESEEK].p = 0;
 	kill_meeseek(index);
 }
