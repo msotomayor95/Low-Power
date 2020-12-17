@@ -159,23 +159,99 @@ void tss_init() {
 
 vaddr_t tss_task_init(uint32_t index, vaddr_t code_start, uint8_t x, uint8_t y) { 
 	vaddr_t m_start = init_meeseek(index, code_start, x, y);	// creo la tarea, mapeando en memoria virtual lo necesario
-
-	uint32_t stack0_index = index;
-	index = index + BASE_TSS_TASKS_MEESEEKS;
-	tss_tasks[index] = tss_tasks[index % 2];	// igualo la tss de la tarea que estoy creando al de su creador (rick = 0 o morty = 1)
-	tss_tasks[index].cs = (GDT_IDX_CODE_3 << 3) | 3;
+	uint32_t stack0_index = index; 
+	uint32_t tasks_index = index + BASE_TSS_TASKS_MEESEEKS;
 
 	// solo hay unos campos que difieren del meeseek con su creador
 	// selecciono una pagina de 20 que tenia previamente inicializadas
-	tss_tasks[index].esp0 = stack0[stack0_index] + 0x1000;
+	
 
 	// dir virtual mapeada a la primera de las 2 paginas de la tarea
-	tss_tasks[index].eip = m_start; 
+	
 	// dir virtual mapeada a la direccion de la segunda pagina de la tarea
-	tss_tasks[index].esp = m_start + 0x1000*0x2; 
-	tss_tasks[index].ebp = m_start + 0x1000*0x2;
+	
+
+	tss_tasks[tasks_index].ptl = 0;
+  	tss_tasks[tasks_index].unused0 = 0;
+	tss_tasks[tasks_index].esp0 = stack0[stack0_index] + 0x1000;
+	tss_tasks[tasks_index].ss0 = GDT_IDX_DATA_0 << 3;
+	tss_tasks[tasks_index].unused1 = 0;
+	tss_tasks[tasks_index].esp1 = 0;
+	tss_tasks[tasks_index].ss1 = 0;
+	tss_tasks[tasks_index].unused2 = 0;
+	tss_tasks[tasks_index].esp2 = 0;
+	tss_tasks[tasks_index].ss2 = 0;
+	tss_tasks[tasks_index].unused3 = 0;
+	tss_tasks[tasks_index].cr3 = rcr3();
+	tss_tasks[tasks_index].eip = m_start;
+	tss_tasks[tasks_index].eflags = 0x202;
+	tss_tasks[tasks_index].eax = 0;
+	tss_tasks[tasks_index].ecx = 0;
+	tss_tasks[tasks_index].edx = 0;
+	tss_tasks[tasks_index].ebx = 0;
+	tss_tasks[tasks_index].esp = m_start + 0x1000*0x2; 
+	tss_tasks[tasks_index].ebp = m_start + 0x1000*0x2;
+	tss_tasks[tasks_index].esi = 0;
+	tss_tasks[tasks_index].edi = 0;
+	tss_tasks[tasks_index].es = GDT_IDX_DATA_3<<3 | 3;
+	tss_tasks[tasks_index].unused4 = 0;
+	tss_tasks[tasks_index].cs = GDT_IDX_CODE_3<<3 | 3;
+	tss_tasks[tasks_index].unused5 = 0;
+	tss_tasks[tasks_index].ss = GDT_IDX_DATA_3<<3 | 3;
+	tss_tasks[tasks_index].unused6 = 0;
+	tss_tasks[tasks_index].ds = GDT_IDX_DATA_3<<3 | 3;
+	tss_tasks[tasks_index].unused7 = 0;
+	tss_tasks[tasks_index].fs = GDT_IDX_DATA_3<<3 | 3;
+	tss_tasks[tasks_index].unused8 = 0;
+	tss_tasks[tasks_index].gs = GDT_IDX_DATA_3<<3 | 3;
+	tss_tasks[tasks_index].unused9 = 0;
+	tss_tasks[tasks_index].ldt = 0;
+	tss_tasks[tasks_index].unused10 = 0;
+	tss_tasks[tasks_index].dtrap = 0;
+	tss_tasks[tasks_index].iomap = 0;
 
 	gdt[index + GDT_FIRST_MEESEEK].p = 1;								// activo el descriptor del tss correspondiente
+	
+	// print_hex(tss_tasks[tasks_index].ptl, 8, 0, 0, 0xF);
+	// print_hex(tss_tasks[tasks_index].unused0, 8, 0, 1, 0xF);
+	// print_hex(tss_tasks[tasks_index].esp0, 8, 0, 2, 0xF);
+	// print_hex(tss_tasks[tasks_index].ss0, 8, 0, 3, 0xF);
+	// print_hex(tss_tasks[tasks_index].unused1, 8, 0, 4, 0xF);
+	// print_hex(tss_tasks[tasks_index].esp1, 8, 0, 5, 0xF);
+	// print_hex(tss_tasks[tasks_index].ss1, 8, 0, 6, 0xF);
+	// print_hex(tss_tasks[tasks_index].unused2, 8, 0, 7, 0xF);
+	// print_hex(tss_tasks[tasks_index].esp2, 8, 0, 8, 0xF);
+	// print_hex(tss_tasks[tasks_index].ss2, 8, 0, 9, 0xF);
+	// print_hex(tss_tasks[tasks_index].unused3, 8, 0, 10, 0xF);
+	// print_hex(tss_tasks[tasks_index].cr3, 8, 0, 11, 0xF);
+	// print_hex(tss_tasks[tasks_index].eip, 8, 0, 12, 0xF);
+	// print_hex(tss_tasks[tasks_index].eflags, 8, 0, 13, 0xF);
+	// print_hex(tss_tasks[tasks_index].eax, 8, 0, 14, 0xF);
+	// print_hex(tss_tasks[tasks_index].ecx, 8, 0, 15, 0xF);
+	// print_hex(tss_tasks[tasks_index].edx, 8, 0, 16, 0xF);
+	// print_hex(tss_tasks[tasks_index].ebx, 8, 0, 17, 0xF);
+	// print_hex(tss_tasks[tasks_index].esp, 8, 0, 18, 0xF);
+	// print_hex(tss_tasks[tasks_index].ebp, 8, 0, 19, 0xF);
+	// print_hex(tss_tasks[tasks_index].esi, 8, 0, 20, 0xF);
+	// print_hex(tss_tasks[tasks_index].edi, 8, 0, 21, 0xF);
+	// print_hex(tss_tasks[tasks_index].es, 8, 0, 22, 0xF);
+	// print_hex(tss_tasks[tasks_index].unused4, 8, 0, 23, 0xF);
+	// print_hex(tss_tasks[tasks_index].cs, 8, 0, 24, 0xF);
+	// print_hex(tss_tasks[tasks_index].unused5, 8, 0, 25, 0xF);
+	// print_hex(tss_tasks[tasks_index].ss, 8, 0, 26, 0xF);
+	// print_hex(tss_tasks[tasks_index].unused6, 8, 0, 27, 0xF);
+	// print_hex(tss_tasks[tasks_index].ds, 8, 0, 28, 0xF);
+	// print_hex(tss_tasks[tasks_index].unused7, 8, 0, 29, 0xF);
+	// print_hex(tss_tasks[tasks_index].fs, 8, 0, 30, 0xF);
+	// print_hex(tss_tasks[tasks_index].unused8, 8, 0, 31, 0xF);
+	// print_hex(tss_tasks[tasks_index].gs, 8, 0, 32, 0xF);
+	// print_hex(tss_tasks[tasks_index].unused9, 8, 0, 33, 0xF);
+	// print_hex(tss_tasks[tasks_index].ldt, 8, 0, 34, 0xF);
+	// print_hex(tss_tasks[tasks_index].unused10, 8, 0, 35, 0xF);
+	// print_hex(tss_tasks[tasks_index].dtrap, 8, 0, 36, 0xF);
+	// print_hex(tss_tasks[tasks_index].iomap, 8, 0, 37, 0xF);
+	// print_dec(tasks_index, 2, 0, 38, 0xF);
+	// breakpoint();
 	return m_start;
 }
 

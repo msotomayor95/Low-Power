@@ -161,12 +161,10 @@ vaddr_t init_meeseek(uint32_t index, vaddr_t code_start, uint8_t x, uint8_t y)
 	paddr_t map_dir = BASE_MAP + map_offset; // 8 * 1024 = 2 paginas. 80*y*8*1024 + x*8*1024
 	uint32_t i = (uint32_t)index / 2;		 // el indice de meeseeks va de 0 a 19
 
-	if (index % 2 == 0)
-	{
+	if (index % 2 == 0) {
 		vaddr_rick[i] = 0;
 	}
-	else
-	{
+	else {
 		vaddr_morty[i] = 0;
 	}
 
@@ -177,8 +175,7 @@ vaddr_t init_meeseek(uint32_t index, vaddr_t code_start, uint8_t x, uint8_t y)
 	mmu_map_page(cr3, free_dir + 0x1000, map_dir + 0x1000, 0x1, 0x1);
 	uint8_t *source = (uint8_t *)code_start;
 	uint8_t *destiny = (uint8_t *)free_dir;
-	for (i = 0; i < 0x1000 * 2; ++i)
-	{
+	for (i = 0; i < 0x1000 * 2; ++i) {
 		destiny[i] = source[i];
 	}
 
