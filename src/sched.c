@@ -17,6 +17,13 @@ uint32_t abs(int n){
 	return n<0? -n:n;
 }
 
+uint8_t dist_manhattan(uint8_t x1, uint8_t y1, uint8_t x2, uint8_t y2){
+	int x = x2 - x1;
+	int y = y2 - y1;
+	
+	return abs(x) + abs(y);
+}
+
 void sched_init(void) {
 	cant_meeseeks_rick = 0;
 	puntaje_rick = 0;
@@ -61,7 +68,7 @@ uint16_t sched_next_task(void) {
 	}
 	uint16_t resultado = ((tarea_actual + FIRST_TSS) << 3);
 	actualizar_pantalla();
-	print_dec(tarea_actual, 2, 0, 0, 0xF);
+	// print_dec(tarea_actual, 2, 0, 0, 0xF);
 	return resultado;
 }
 
@@ -131,9 +138,6 @@ uint32_t crear_meeseek(vaddr_t code_start, uint8_t x, uint8_t y) {
 
 		if(todas_las_semillas_encontradas() == 1) {
 			sentenciar_ganador(0);
-			while(1){
-				__asm volatile("nop");
-			};
 		}
 		
 		return 0;
@@ -160,7 +164,7 @@ uint8_t todas_las_semillas_encontradas() {
 }
 
 void sentenciar_ganador(uint8_t por_excepcion) {
-	if (por_excepcion == 0){
+	if (por_excepcion == 0) {
 		if(puntaje_rick < puntaje_morty) {
 			print("Gano Morty", 0, 0, 0xF);
 		} else if ( puntaje_morty < puntaje_rick) {
@@ -171,6 +175,10 @@ void sentenciar_ganador(uint8_t por_excepcion) {
 	} else {
 		char* win_text = tarea_actual == 0? "Gano Morty":"Gano Rick";
 		print(win_text, 0, 0, 0xF);
+	}
+
+	while(1) {
+		__asm volatile("nop");
 	}
 }
 
@@ -226,6 +234,10 @@ uint32_t mover_meeseek(int x, int y) {
 		if (seed_array[i].found == 0 && seed_array[i].x == nuevo_x && seed_array[i].y == nuevo_y) {
 			asimilar_semilla(i);
 			matar_meeseek();
+
+			if (todas_las_semillas_encontradas() == 1) {
+				sentenciar_ganador(0);
+			}
 			return 1;
 		}
 		i++;
@@ -235,4 +247,52 @@ uint32_t mover_meeseek(int x, int y) {
 	meeseeks[tarea_actual-2].x = (uint8_t) nuevo_x;
 	meeseeks[tarea_actual-2].y = (uint8_t) nuevo_y;
 	return 1;
+}
+
+int semilla_x() {
+
+	if (tarea_actual == 0 || tarea_actual == 1) {
+		return -1;
+	}
+
+	uint8_t result_index = 0;
+	uint8_t current_dist = 255;
+
+	mr_meeseek_t m = meeseeks[tarea_actual - 2];
+
+	for(int j = 0; j < MAX_SEEDS; j++) {
+		uint8_t d = dist_manhattan(m.x, m.y, seed_array[j].x, seed_array[j].y);  
+		if (d < current_dist ){
+			current_dist = d;
+			result_index = j;
+		}
+	}
+	
+
+	int x = seed_array[result_index].x - m.x;
+	return x;
+}
+
+int semilla_y() {
+
+	if (tarea_actual == 0 || tarea_actual == 1) {
+		return -1;
+	}
+
+	uint8_t result_index = 0;
+	uint8_t current_dist = 255;
+
+	mr_meeseek_t m = meeseeks[tarea_actual - 2];
+
+	for(int j = 0; j < MAX_SEEDS; j++) {
+		uint8_t d = dist_manhattan(m.x, m.y, seed_array[j].x, seed_array[j].y);  
+		if (d < current_dist ){
+			current_dist = d;
+			result_index = j;
+		}
+	}
+	
+
+	int y = seed_array[result_index].y - m.y;
+	return y;
 }

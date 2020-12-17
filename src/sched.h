@@ -51,6 +51,8 @@ void reducir_dist_maxima(uint8_t index);
 void asimilar_semilla(uint8_t s);
 uint8_t todas_las_semillas_encontradas();
 void sentenciar_ganador(uint8_t por_excepcion);
+int semilla_x();
+int semilla_y();
 void actualizar_pantalla();
 void matar_meeseek();
 

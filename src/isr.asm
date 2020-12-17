@@ -27,6 +27,8 @@ extern valores_validos
 extern puedo_crear_meeseek
 extern crear_meeseek
 extern mover_meeseek
+extern semilla_x
+extern semilla_y
 extern sentenciar_ganador
 extern sched_next_task
 
@@ -220,11 +222,25 @@ _isr89:
     jmp far [idle_offset]
     iret
 
+x: dd 0x0
+y: dd 0x0
+
 _isr100:
-    mov eax, 0x64
+    pushad
+    
+    call semilla_x
+    mov [x], eax
+    call semilla_y
+    mov [y], eax
+
+    xchg bx, bx
+    
     mov dx, GDT_IDX_TSS_IDLE<<3
     mov [idle_selector], dx
     jmp far [idle_offset]
+    popad
+    mov eax, [x]
+    mov ebx, [y]
     iret
 
 result: dd 0x0
