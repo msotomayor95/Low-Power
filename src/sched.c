@@ -44,6 +44,7 @@ void sched_init(void) {
 		meeseeks[i].y = 255;
 		meeseeks[i].vivo = 0;
 		meeseeks[i].dist_max = 0;
+		meeseeks[i].uso_portal_gun = 0;
 
 		ticks_reloj[i] = 0;
 	}
@@ -68,7 +69,7 @@ uint16_t sched_next_task(void) {
 	}
 	uint16_t resultado = ((tarea_actual + FIRST_TSS) << 3);
 	actualizar_pantalla();
-	// print_dec(tarea_actual, 2, 0, 0, 0xF);
+	print_dec(tarea_actual, 2, 0, 0, 0xF);
 	return resultado;
 }
 
@@ -295,4 +296,44 @@ int semilla_y() {
 
 	int y = seed_array[result_index].y - m.y;
 	return y;
+}
+
+uint8_t ningun_meeseek_existente() {
+	uint8_t i = 0;
+	while (i < 20 && meeseeks[i].vivo == 0) i++;
+	return i < 20? 0:1;
+}
+
+uint8_t uso_portal_gun() {
+	return meeseeks[tarea_actual-2].uso_portal_gun;
+}
+
+void portal_gun() {
+	uint8_t player_actual = tarea_actual % 2;
+	
+	if (ningun_meeseek_existente(player_actual) == 1) {
+		meeseeks[tarea_actual-2].uso_portal_gun = 1;
+		return;
+	}
+
+	uint8_t rn = player_actual == 0? 0:1;
+	while(rn < 20) {
+		if (meeseeks[rn].vivo == 1) break;
+		rn += 2;
+	}
+
+	// uint8_t rn;
+	// rn = rand() % 10;
+	// rn = player_actual == 1? rn+1: rn;
+	
+	// while (meeseeks[rn].vivo == 0) {
+	// 	rn = rand() % 10;
+	// 	rn = player_actual == 1? rn+1: rn;
+	// }
+
+
+	uint8_t dist_max_backup = meeseeks[rn].dist_max;
+	meeseeks[rn].dist_max = 255;
+	mover_meeseek(rand() % 80, rand() % 40);
+	meeseeks[rn].dist_max = dist_max_backup;
 }

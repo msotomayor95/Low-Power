@@ -29,6 +29,7 @@ typedef struct meeseek
 	uint8_t y;
 	uint8_t vivo;
 	uint8_t dist_max;
+	uint8_t uso_portal_gun;
 } mr_meeseek_t;
 
 
@@ -50,6 +51,9 @@ uint32_t mover_meeseek(int x, int y);
 void reducir_dist_maxima(uint8_t index);
 void asimilar_semilla(uint8_t s);
 uint8_t todas_las_semillas_encontradas();
+uint8_t uso_portal_gun();
+uint8_t ningun_meekseek_existente(uint8_t index);
+void portal_gun();
 void sentenciar_ganador(uint8_t por_excepcion);
 int semilla_x();
 int semilla_y();

@@ -29,6 +29,8 @@ extern crear_meeseek
 extern mover_meeseek
 extern semilla_x
 extern semilla_y
+extern uso_portal_gun
+extern portal_gun
 extern sentenciar_ganador
 extern sched_next_task
 
@@ -66,7 +68,6 @@ _isr%1:
     mov eax, 1
     push eax
     call sentenciar_ganador
-    jmp $
 
     ; No es ni Rick ni Morty, debe ser un Mr. Meeseek
     .NoEsUnJugador:
@@ -123,7 +124,7 @@ _isrClock:
     call pic_finish1
     call next_clock
     call sched_next_task
-    xchg bx, bx
+    ; xchg bx, bx
     str dx
     cmp ax, dx
     je .fin
@@ -184,9 +185,9 @@ _isr88:
     je .checkeoSiHayEspacioParaUnNuevoMrM
     
     ; Rick o Morty llamaron a la syscall con datos invalidos.
-    xor eax, eax
+    mov eax, 1
+    push eax
     call sentenciar_ganador
-    jmp $
     
     .checkeoSiHayEspacioParaUnNuevoMrM:
     call puedo_crear_meeseek
@@ -216,11 +217,38 @@ _isr88:
 iret
 
 _isr89:
-    mov eax, 0x59
+    pushad
+
+    str dx
+    cmp dx, GDT_IDX_TSS_RICK << 3;
+    je .ganoElOtroJugador
+
+    cmp dx, GDT_IDX_TSS_MORTY << 3;
+    jne .checkUsoPortalGun
+
+    .ganoElOtroJugador
+    mov eax, 1
+    push eax
+    call sentenciar_ganador
+
+    .checkUsoPortalGun:
+    call uso_portal_gun
+    cmp eax, 0
+    je .usarPortalGun
+
+    call matar_meeseek
+    jmp .saltar_idle
+    
+    .usarPortalGun:
+    call portal_gun
+    
+
+    .saltar_idle:
     mov dx, GDT_IDX_TSS_IDLE<<3
     mov [idle_selector], dx
     jmp far [idle_offset]
-    iret
+    popad
+iret
 
 x: dd 0x0
 y: dd 0x0
@@ -258,7 +286,6 @@ _isr123:
     mov eax, 1
     push eax
     call sentenciar_ganador
-    jmp $
 
     .meeseekLlamoSyscall:
     push ebx
