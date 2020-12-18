@@ -213,12 +213,10 @@ void actualizar_pantalla(){
 }
 
 uint32_t mover_meeseek(int x, int y) {
-
 	uint8_t dist = abs(x) + abs(y);
 	if (meeseeks[tarea_actual-2].dist_max < dist) {
 		return 0;
 	}
-
 	int nuevo_x = (meeseeks[tarea_actual-2].x + x) % 80;
 	int nuevo_y = (meeseeks[tarea_actual-2].y + y) % 40;
 
@@ -268,7 +266,10 @@ int semilla_x() {
 			result_index = j;
 		}
 	}
-	
+	// print_dec(current_dist, 4, 20, 0, 0xf);
+	// print_dec(result_index, 4, 40, 0, 0xf);
+
+	// breakpoint();
 
 	int x = seed_array[result_index].x - m.x;
 	return x;

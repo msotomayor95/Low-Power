@@ -124,7 +124,6 @@ _isrClock:
     call pic_finish1
     call next_clock
     call sched_next_task
-    ; xchg bx, bx
     str dx
     cmp ax, dx
     je .fin
@@ -261,8 +260,6 @@ _isr100:
     mov [x], eax
     call semilla_y
     mov [y], eax
-
-    xchg bx, bx
     
     mov dx, GDT_IDX_TSS_IDLE<<3
     mov [idle_selector], dx
