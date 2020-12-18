@@ -69,7 +69,7 @@ uint16_t sched_next_task(void) {
 	}
 	uint16_t resultado = ((tarea_actual + FIRST_TSS) << 3);
 	actualizar_pantalla();
-	print_dec(tarea_actual, 2, 0, 0, 0xF);
+	// print_dec(tarea_actual, 2, 0, 0, 0xF);
 	return resultado;
 }
 
@@ -309,31 +309,38 @@ uint8_t uso_portal_gun() {
 }
 
 void portal_gun() {
+	meeseeks[tarea_actual-2].uso_portal_gun = 1;
 	uint8_t player_actual = tarea_actual % 2;
 	
 	if (ningun_meeseek_existente(player_actual) == 1) {
-		meeseeks[tarea_actual-2].uso_portal_gun = 1;
 		return;
 	}
 
-	uint8_t rn = player_actual == 0? 0:1;
-	while(rn < 20) {
-		if (meeseeks[rn].vivo == 1) break;
-		rn += 2;
-	}
-
-	// uint8_t rn;
-	// rn = rand() % 10;
-	// rn = player_actual == 1? rn+1: rn;
-	
-	// while (meeseeks[rn].vivo == 0) {
-	// 	rn = rand() % 10;
-	// 	rn = player_actual == 1? rn+1: rn;
+	// uint8_t rn = player_actual == 0? 1:0;
+	// while(rn < 20) {
+	// 	if (meeseeks[rn].vivo == 1) break;
+	// 	rn += 2;
 	// }
+
+	uint8_t rn;
+	rn = rand() % 10;
+	rn = player_actual == 1? rn: rn+1;
+	
+	while (meeseeks[rn].vivo == 0) {
+		rn = rand() % 10;
+		rn = player_actual == 1? rn: rn+1;
+	}
 
 
 	uint8_t dist_max_backup = meeseeks[rn].dist_max;
 	meeseeks[rn].dist_max = 255;
-	mover_meeseek(rand() % 80, rand() % 40);
+	uint8_t x = rand() % 80;
+	uint8_t y = rand() % 40;
+	
+	uint8_t backup_tarea_actual = tarea_actual;
+	tarea_actual = rn+2;
+	mover_meeseek(x, y);
+	tarea_actual = backup_tarea_actual;
+
 	meeseeks[rn].dist_max = dist_max_backup;
 }

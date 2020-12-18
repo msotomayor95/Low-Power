@@ -16,11 +16,8 @@ void meeseks1_func(void) {
   //   __asm volatile("nop");
   // }
 
-  breakpoint();
   syscall_use_portal_gun();
-  breakpoint();
   syscall_use_portal_gun(); 
-  breakpoint();
 
   while (1) {
     __asm volatile("nop");

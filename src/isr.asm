@@ -218,6 +218,7 @@ iret
 
 _isr89:
     pushad
+    xchg bx, bx
 
     str dx
     cmp dx, GDT_IDX_TSS_RICK << 3;
