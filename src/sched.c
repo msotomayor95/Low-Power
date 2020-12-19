@@ -245,6 +245,10 @@ uint32_t mover_meeseek(int x, int y) {
 	mover_codigo_meeseek(tarea_actual-2, nuevo_x, nuevo_y);
 	meeseeks[tarea_actual-2].x = (uint8_t) nuevo_x;
 	meeseeks[tarea_actual-2].y = (uint8_t) nuevo_y;
+	
+	// print_dec(meeseeks[tarea_actual-2].x, 2, 3, 0, 0xF);
+	// print_dec(meeseeks[tarea_actual-2].y, 2, 6, 0, 0xF);
+
 	return 1;
 }
 
@@ -260,18 +264,19 @@ int semilla_x() {
 	mr_meeseek_t m = meeseeks[tarea_actual - 2];
 
 	for(int j = 0; j < MAX_SEEDS; j++) {
-		uint8_t d = dist_manhattan(m.x, m.y, seed_array[j].x, seed_array[j].y);  
-		if (d < current_dist ){
-			current_dist = d;
-			result_index = j;
+		if (seed_array[j].found == 0) {
+			uint8_t d = dist_manhattan(m.x, m.y, seed_array[j].x, seed_array[j].y);  
+			if (d < current_dist ){
+				current_dist = d;
+				result_index = j;
+			}
 		}
 	}
-	// print_dec(current_dist, 4, 20, 0, 0xf);
-	// print_dec(result_index, 4, 40, 0, 0xf);
-
-	// breakpoint();
 
 	int x = seed_array[result_index].x - m.x;
+	print_dec(tarea_actual, 2, 0, 0, 0xF);
+	print_dec(x, 2, 3, 0, 0xF);
+
 	return x;
 }
 
@@ -296,6 +301,7 @@ int semilla_y() {
 	
 
 	int y = seed_array[result_index].y - m.y;
+	print_dec(y, 2, 6, 0, 0xF);
 	return y;
 }
 
@@ -316,12 +322,6 @@ void portal_gun() {
 	if (ningun_meeseek_existente(player_actual) == 1) {
 		return;
 	}
-
-	// uint8_t rn = player_actual == 0? 1:0;
-	// while(rn < 20) {
-	// 	if (meeseeks[rn].vivo == 1) break;
-	// 	rn += 2;
-	// }
 
 	uint8_t rn;
 	rn = rand() % 10;

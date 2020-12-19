@@ -54,6 +54,7 @@ global _isr123
 global _isr%1
 
 _isr%1:
+    xchg bx, bx
     pushad
     mov eax, %1
     str dx
@@ -124,6 +125,7 @@ _isrClock:
     call pic_finish1
     call next_clock
     call sched_next_task
+    xchg bx, bx
     str dx
     cmp ax, dx
     je .fin
