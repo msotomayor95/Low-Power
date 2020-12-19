@@ -38,7 +38,7 @@
 #define BASE_TSS_TASKS_MEESEEKS 2
 
 // Maxima cantidad de semillas
-#define MAX_SEEDS 5
+#define MAX_SEEDS 40
 
 // asd
 #define MMU_FLAG_PRESENT (0x1)

@@ -54,8 +54,8 @@ global _isr123
 global _isr%1
 
 _isr%1:
-    xchg bx, bx
     pushad
+    xchg bx, bx
     mov eax, %1
     str dx
     
@@ -125,7 +125,7 @@ _isrClock:
     call pic_finish1
     call next_clock
     call sched_next_task
-    xchg bx, bx
+    ; xchg bx, bx
     str dx
     cmp ax, dx
     je .fin
@@ -219,7 +219,6 @@ iret
 
 _isr89:
     pushad
-    xchg bx, bx
 
     str dx
     cmp dx, GDT_IDX_TSS_RICK << 3;
@@ -252,23 +251,19 @@ _isr89:
     popad
 iret
 
-x: dd 0x0
-y: dd 0x0
 
 _isr100:
     pushad
     
     call semilla_x
-    mov [x], eax
+    mov [esp+28], eax
     call semilla_y
-    mov [y], eax
+    mov [esp+16], eax
     
     mov dx, GDT_IDX_TSS_IDLE<<3
     mov [idle_selector], dx
     jmp far [idle_offset]
     popad
-    mov eax, [x]
-    mov ebx, [y]
     iret
 
 result: dd 0x0
@@ -293,15 +288,18 @@ _isr123:
 
     call mover_meeseek
     mov [result], eax
+
+    pop eax
+    pop ebx
+    mov eax, [result]
+
+    mov [esp+28], eax
+
     mov dx, GDT_IDX_TSS_IDLE<<3
     mov [idle_selector], dx
     jmp far [idle_offset]
-    
-    pop eax
-    pop ebx
 
     popad
-    mov eax, [result]
     iret
 
 ;; Funciones Auxiliares

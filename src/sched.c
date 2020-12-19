@@ -18,10 +18,10 @@ uint32_t abs(int n){
 }
 
 uint8_t dist_manhattan(uint8_t x1, uint8_t y1, uint8_t x2, uint8_t y2){
-	int x = x2 - x1;
-	int y = y2 - y1;
+	uint8_t x = abs(x2 - x1);
+	uint8_t y = abs(y2 - y1);
 	
-	return abs(x) + abs(y);
+	return x + y;
 }
 
 void sched_init(void) {
@@ -51,6 +51,10 @@ void sched_init(void) {
 }
 
 uint16_t sched_next_task(void) {
+	if (tarea_actual > 1) {
+		reducir_dist_maxima(tarea_actual-2); // Se reduce despues haber corrido al meeseek.
+	}
+
 	tarea_actual = (tarea_actual + 1) % 22;
 	if (tarea_actual > 1) { // La siguiente tarea a ejecutar puede ser un Mr. Meeseek.
 		int i = tarea_actual-2;
@@ -61,8 +65,8 @@ uint16_t sched_next_task(void) {
 			i++;
 		}
 		if (i < 20) {
-			reducir_dist_maxima(i);
 			tarea_actual = i+2;
+			// reducir_dist_maxima(i);
 		} else {
 			tarea_actual = 0;
 		}
@@ -117,6 +121,8 @@ void reducir_dist_maxima(uint8_t index) {
 		}
 		ticks_reloj[index] = 2;
 	}
+
+	// print_dec(ticks_reloj[index], 1, 0, 0, 0xF);
 }
 
 void asimilar_semilla(uint8_t i){
@@ -155,6 +161,10 @@ uint32_t crear_meeseek(vaddr_t code_start, uint8_t x, uint8_t y) {
 
 	tarea_actual == 0? cant_meeseeks_rick++: cant_meeseeks_morty++;	
 	uint32_t resultado = tss_task_init(i, code_start, x, y);
+
+	// print_dec(meeseeks[i].x, 2, 3, 0, 0xF);
+	// print_dec(meeseeks[i].y, 2, 6, 0, 0xF);
+
 	return resultado;
 }
 
@@ -255,6 +265,7 @@ uint32_t mover_meeseek(int x, int y) {
 int semilla_x() {
 
 	if (tarea_actual == 0 || tarea_actual == 1) {
+		// print("-1", 0, 0, 0xF);
 		return -1;
 	}
 
@@ -274,8 +285,8 @@ int semilla_x() {
 	}
 
 	int x = seed_array[result_index].x - m.x;
-	print_dec(tarea_actual, 2, 0, 0, 0xF);
-	print_dec(x, 2, 3, 0, 0xF);
+	// print_dec(tarea_actual, 2, 0, 0, 0xF);
+	// print_dec(x, 2, 3, 0, 0xF);
 
 	return x;
 }
@@ -283,6 +294,7 @@ int semilla_x() {
 int semilla_y() {
 
 	if (tarea_actual == 0 || tarea_actual == 1) {
+		// print("-1", 2, 0, 0xF);
 		return -1;
 	}
 
@@ -292,16 +304,18 @@ int semilla_y() {
 	mr_meeseek_t m = meeseeks[tarea_actual - 2];
 
 	for(int j = 0; j < MAX_SEEDS; j++) {
-		uint8_t d = dist_manhattan(m.x, m.y, seed_array[j].x, seed_array[j].y);  
-		if (d < current_dist ){
-			current_dist = d;
-			result_index = j;
+		if (seed_array[j].found == 0) {
+			uint8_t d = dist_manhattan(m.x, m.y, seed_array[j].x, seed_array[j].y);  
+			if (d < current_dist ){
+				current_dist = d;
+				result_index = j;
+			}
 		}
 	}
 	
 
 	int y = seed_array[result_index].y - m.y;
-	print_dec(y, 2, 6, 0, 0xF);
+	// print_dec(y, 2, 6, 0, 0xF);
 	return y;
 }
 
