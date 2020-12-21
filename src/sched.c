@@ -408,7 +408,11 @@ char *excepName[] = {
 };
 
 
-void mostrar_pantalla_debug(uint32_t exceptionIndex,
+void mostrar_pantalla_debug(uint32_t cr0, 
+							uint32_t cr2, 
+							uint32_t cr3, 
+							uint32_t cr4,
+							uint32_t exceptionIndex,
 							uint32_t edi,
 							uint32_t esi, 
 							uint32_t ebp, 
@@ -448,6 +452,19 @@ void mostrar_pantalla_debug(uint32_t exceptionIndex,
 
 	print    ("ebp", startX+2, startY+17, C_FG_WHITE);
 	print_hex(ebp,8, startX+6, startY+17, C_FG_GREEN);
+
+	print    ("cr0", startX+16, startY+ 6, C_FG_WHITE);
+	print_hex(cr0,8, startX+20, startY+ 6, C_FG_GREEN);
+
+	print    ("cr2", startX+16, startY+ 8, C_FG_WHITE);
+	print_hex(cr2,8, startX+20, startY+ 8, C_FG_GREEN);	
+
+	print    ("cr3", startX+16, startY+10, C_FG_WHITE);
+	print_hex(cr3,8, startX+20, startY+10, C_FG_GREEN);
+
+	print    ("cr4", startX+16, startY+12, C_FG_WHITE);
+	print_hex(cr4,8, startX+20, startY+12, C_FG_GREEN);
+
 
 
 	while (modo_debug_corriendo == 1){

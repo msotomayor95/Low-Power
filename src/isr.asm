@@ -65,9 +65,25 @@ _isr%1:
     cmp al, 0
     je .seguirEjecucion
 
+    ; Estoy con el modo debug encendido
+
+    ; Pusheo indice de la interrupcion.
     mov eax, %1
     push eax
-    ; Estoy con el modo debug encendido
+
+    ; pusheo los crs
+    mov eax, cr4
+    push eax
+
+    mov eax, cr3
+    push eax
+
+    mov eax, cr2
+    push eax
+
+    mov eax, cr0
+    push eax
+
     sti
     call mostrar_pantalla_debug
 
