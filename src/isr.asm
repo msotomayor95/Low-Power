@@ -60,10 +60,13 @@ global _isr%1
 
 _isr%1:
     pushad
+    xchg bx, bx
     call check_modo_debug
     cmp al, 0
     je .seguirEjecucion
 
+    mov eax, %1
+    push eax
     ; Estoy con el modo debug encendido
     sti
     call mostrar_pantalla_debug

@@ -374,20 +374,85 @@ uint8_t check_modo_debug_corriendo() {
 void cambiar_modo_debug() {
 	if (modo_debug == 0 ) {
 		modo_debug = 1;
-		print("modo debug activado", 0, 0, 0xF);
+		// print("modo debug activado", 0, 0, 0xF);
 	} else {
 		if (modo_debug_corriendo == 1) {
 			modo_debug_corriendo = 0;
-			print("modo debug dejo de correr", 35, 0, 0xF);
+			// print("modo debug dejo de correr", 35, 0, 0xF);
 		}
 	}
 }
 
-void mostrar_pantalla_debug() {
+
+char *excepName[] = {
+	"0 Error de division",
+	"1 Reservada",
+	"2 NMI",
+	"3 Breakpoint",
+	"4 Overflow",
+	"5 BOUND Range Exceeded",
+	"6 Invalid Opcode",
+	"7 CP no disponible",
+	"8 Double fault",
+	"9 CP Segment Overun",
+	"10 TSS invalido",
+	"11 Segmento no presente",
+	"12 SS fault",
+	"13 General Protection",
+	"14 Page fault",
+	"15 Reservada",
+	"16 Error FPU",
+	"17 Alignment Check",
+	"18 Machine Check",
+	"19 SIMD exception"
+};
+
+
+void mostrar_pantalla_debug(uint32_t exceptionIndex,
+							uint32_t edi,
+							uint32_t esi, 
+							uint32_t ebp, 
+							uint32_t ignorar, //aca pushad me pushea el esp de nivel 0, no me importa
+							uint32_t ebx,
+							uint32_t edx,
+							uint32_t ecx,
+							uint32_t eax
+							) {
 	modo_debug_corriendo = 1;
-	print("modo debug esta corriendo", 35, 0, 0xF);
+	
+	ignorar++;
+
+	int32_t startX = 20;
+	int32_t startY = 1;
+
+	screen_draw_box(1, 19, 40, 42, 255, C_BG_BLACK);
+	
+	print(excepName[exceptionIndex], 21, 3, C_FG_GREEN);
+	print    ("eax", startX+2, startY+ 5, C_FG_WHITE);
+	print_hex(eax,8, startX+6, startY+ 5, C_FG_GREEN);
+
+	print    ("ebx", startX+2, startY+ 7, C_FG_WHITE);
+	print_hex(ebx,8, startX+6, startY+ 7, C_FG_GREEN);
+
+	print    ("ecx", startX+2, startY+ 9, C_FG_WHITE);
+	print_hex(ecx,8, startX+6, startY+ 9, C_FG_GREEN);
+
+	print    ("edx", startX+2, startY+11, C_FG_WHITE);
+	print_hex(edx,8, startX+6, startY+11, C_FG_GREEN);
+
+	print    ("esi", startX+2, startY+13, C_FG_WHITE);
+	print_hex(esi,8, startX+6, startY+13, C_FG_GREEN);
+
+	print    ("edi", startX+2, startY+15, C_FG_WHITE);
+	print_hex(edi,8, startX+6, startY+15, C_FG_GREEN);
+
+	print    ("ebp", startX+2, startY+17, C_FG_WHITE);
+	print_hex(ebp,8, startX+6, startY+17, C_FG_GREEN);
+
 
 	while (modo_debug_corriendo == 1){
 		__asm volatile("nop");
 	}
+
+	actualizar_pantalla(); // restauro la pantalla 
 }

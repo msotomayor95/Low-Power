@@ -65,7 +65,16 @@ uint8_t check_modo_debug();
 uint8_t check_modo_debug_corriendo();
 
 void cambiar_modo_debug();
-void mostrar_pantalla_debug();
+void mostrar_pantalla_debug(uint32_t exceptionIndex,
+							uint32_t edi,
+							uint32_t esi, 
+							uint32_t ebp, 
+							uint32_t ignorar, //aca pushad me pushea el esp de nivel 0, no me importa
+							uint32_t ebx,
+							uint32_t edx,
+							uint32_t ecx,
+							uint32_t eax
+							);
 
 
 #endif //  __SCHED_H__
