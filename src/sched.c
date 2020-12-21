@@ -25,6 +25,9 @@ uint8_t dist_manhattan(uint8_t x1, uint8_t y1, uint8_t x2, uint8_t y2){
 }
 
 void sched_init(void) {
+	modo_debug = 0;
+	modo_debug_corriendo = 0;
+
 	cant_meeseeks_rick = 0;
 	puntaje_rick = 0;
 	
@@ -358,4 +361,33 @@ void portal_gun() {
 	tarea_actual = backup_tarea_actual;
 
 	meeseeks[rn].dist_max = dist_max_backup;
+}
+
+uint8_t check_modo_debug() {
+	return modo_debug;
+}
+
+uint8_t check_modo_debug_corriendo() {
+	return modo_debug_corriendo;
+}
+
+void cambiar_modo_debug() {
+	if (modo_debug == 0 ) {
+		modo_debug = 1;
+		print("modo debug activado", 0, 0, 0xF);
+	} else {
+		if (modo_debug_corriendo == 1) {
+			modo_debug_corriendo = 0;
+			print("modo debug dejo de correr", 35, 0, 0xF);
+		}
+	}
+}
+
+void mostrar_pantalla_debug() {
+	modo_debug_corriendo = 1;
+	print("modo debug esta corriendo", 35, 0, 0xF);
+
+	while (modo_debug_corriendo == 1){
+		__asm volatile("nop");
+	}
 }

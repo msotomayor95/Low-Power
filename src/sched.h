@@ -32,7 +32,8 @@ typedef struct meeseek
 	uint8_t uso_portal_gun;
 } mr_meeseek_t;
 
-
+uint8_t modo_debug;
+uint8_t modo_debug_corriendo;
 int tarea_actual;
 int puntaje_rick;
 int puntaje_morty;
@@ -59,5 +60,12 @@ int semilla_x();
 int semilla_y();
 void actualizar_pantalla();
 void matar_meeseek();
+
+uint8_t check_modo_debug();
+uint8_t check_modo_debug_corriendo();
+
+void cambiar_modo_debug();
+void mostrar_pantalla_debug();
+
 
 #endif //  __SCHED_H__

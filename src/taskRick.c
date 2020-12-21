@@ -2,42 +2,42 @@
 #include "syscall.h"
 #include "i386.h"
 
-void meeseks1_func(void);
-void meeseks2_func(void);
 
+uint32_t WAIT_TIME = 500000;
+
+void meeseeks_problematico(void);
 void task(void) {
-  syscall_meeseeks((uint32_t)&meeseks1_func, 5, 5);
-  syscall_meeseeks((uint32_t)&meeseks2_func, 6, 6);
+  while(1){
+      syscall_meeseeks((uint32_t)&meeseeks_problematico, 0, 0);
+      for (uint32_t i = 0; i < WAIT_TIME; ++i)
+      {
+        __asm volatile("nop");
+      }
+      syscall_meeseeks((uint32_t)&meeseeks_problematico, 0, 1);
+      for (uint32_t i = 0; i < WAIT_TIME; ++i)
+      {
+        __asm volatile("nop");
+      }
+      syscall_meeseeks((uint32_t)&meeseeks_problematico, 0, 2);
+      for (uint32_t i = 0; i < WAIT_TIME; ++i)
+      {
+        __asm volatile("nop");
+      }
 
-  while(1) {
-    __asm volatile("nop");
-  } 
-}
 
-void meeseks1_func(void) {
-  // while (1) {
-  //   __asm volatile("nop");
-  // }
-
-  while (1) {
-    for (int i = 0; i < 80; i++) {
-      syscall_move(-1, 0);
-    }
-    syscall_move(0, -1);
   }
 }
 
-void meeseks2_func(void) {
-  
-  // while(1) {
-  //   __asm volatile("nop");
-  // }
-  
-  
+void meeseeks_problematico(void) {
+  for (uint32_t i = 0; i < WAIT_TIME; ++i)
+  {
+    __asm volatile("nop");
+  }
+  uint8_t* kernel_free_area_start = (uint8_t*) 0x100000;
+  int i = 0;
   while (1) {
-    for (int i = 0; i < 80; i++) {
-      syscall_move(1, 0);
-    }
-    syscall_move(0, 1);
+    // breakpoint();
+    kernel_free_area_start[i] = 0x0;
+    i++;
   }
 }

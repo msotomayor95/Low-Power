@@ -21,6 +21,11 @@ extern print_hex
 extern pic_finish1
 
 ;; Sched
+extern check_modo_debug
+extern check_modo_debug_corriendo
+extern cambiar_modo_debug
+extern mostrar_pantalla_debug
+
 extern meeseek_llamo_crear_meeseek
 extern matar_meeseek
 extern valores_validos
@@ -55,10 +60,16 @@ global _isr%1
 
 _isr%1:
     pushad
-    xchg bx, bx
-    mov eax, %1
+    call check_modo_debug
+    cmp al, 0
+    je .seguirEjecucion
+
+    ; Estoy con el modo debug encendido
+    sti
+    call mostrar_pantalla_debug
+
+    .seguirEjecucion:
     str dx
-    
     cmp dx, GDT_IDX_TSS_RICK <<3
     je .ganoElOtroJugador
 
@@ -123,6 +134,11 @@ ISR 31
 _isrClock:
     pushad
     call pic_finish1
+
+    call check_modo_debug_corriendo
+    cmp al, 1
+    je .fin
+
     call next_clock
     call sched_next_task
     ; xchg bx, bx
@@ -144,15 +160,20 @@ _isrKey:
     xor eax, eax
     in al, 0x60
     cmp eax, 0x80
-    jge .solte 
-    push 0x0f       ; text blanco en fondo negro
-    push 0
-    push 79
-    push 1
-    push eax
-    call print_hex
-    add esp, 20
-    .solte:
+    jge .fin
+    
+    cmp eax, 0x15
+    jne .fin
+    sti                     ; activos interrupciones. Necesario para apagar el flag del modo debug
+    call cambiar_modo_debug
+    ; push 0x0f             ; text blanco en fondo negro
+    ; push 0
+    ; push 79
+    ; push 1
+    ; push eax
+    ; call print_hex
+    ; add esp, 20
+    .fin:
     popad
     iret
 
