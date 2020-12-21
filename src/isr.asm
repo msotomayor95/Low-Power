@@ -59,8 +59,8 @@ global _isr123
 global _isr%1
 
 _isr%1:
+    ;xchg bx, bx
     pushad
-    xchg bx, bx
     call check_modo_debug
     cmp al, 0
     je .seguirEjecucion
