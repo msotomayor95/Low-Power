@@ -65,7 +65,11 @@ uint8_t check_modo_debug();
 uint8_t check_modo_debug_corriendo();
 
 void cambiar_modo_debug();
-void mostrar_pantalla_debug(uint32_t exceptionIndex,
+void mostrar_pantalla_debug(uint32_t cr0, 
+							uint32_t cr2, 
+							uint32_t cr3, 
+							uint32_t cr4,
+							uint32_t exceptionIndex,
 							uint32_t edi,
 							uint32_t esi, 
 							uint32_t ebp, 
