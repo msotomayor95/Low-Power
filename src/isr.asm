@@ -38,6 +38,7 @@ extern uso_portal_gun
 extern portal_gun
 extern sentenciar_ganador
 extern sched_next_task
+extern present_error_code
 
 %define GDT_IDX_TSS_IDLE 16
 %define GDT_IDX_TSS_RICK 17
@@ -59,13 +60,37 @@ global _isr123
 global _isr%1
 
 _isr%1:
-    ;xchg bx, bx
     pushad
     call check_modo_debug
     cmp al, 0
     je .seguirEjecucion
 
     ; Estoy con el modo debug encendido
+    mov eax, %1
+    push eax
+    call present_error_code
+    cmp eax, 1
+    jne .noTieneErrorCode
+    pop eax
+    
+    .noTieneErrorCode:
+    mov eax, [esp + 32]
+    push eax
+
+    mov eax, [esp + 40]                ; eip
+    push eax
+
+    mov eax, [esp + 48]               ; cs
+    push eax
+
+    mov eax, [esp + 56]               ; eflags
+    push eax
+
+    mov eax, [esp + 64]               ; esp
+    push eax
+
+    mov eax, [esp + 72]              ; ss
+    push eax
 
     ; Pusheo indice de la interrupcion.
     mov eax, %1
@@ -82,6 +107,20 @@ _isr%1:
     push eax
 
     mov eax, cr0
+    push eax
+
+    ; selectores de segmento
+    xor eax, eax
+    mov ax, ds
+    push eax
+
+    mov ax, es
+    push eax
+    
+    mov ax, fs
+    push eax
+
+    mov ax, gs
     push eax
 
     sti
@@ -267,7 +306,7 @@ _isr89:
     cmp dx, GDT_IDX_TSS_MORTY << 3;
     jne .checkUsoPortalGun
 
-    .ganoElOtroJugador
+    .ganoElOtroJugador:
     mov eax, 1
     push eax
     call sentenciar_ganador

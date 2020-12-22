@@ -408,11 +408,21 @@ char *excepName[] = {
 };
 
 
-void mostrar_pantalla_debug(uint32_t cr0, 
+void mostrar_pantalla_debug(uint32_t gs,
+							uint32_t fs,
+							uint32_t es,
+							uint32_t ds,
+							uint32_t cr0, 
 							uint32_t cr2, 
 							uint32_t cr3, 
 							uint32_t cr4,
 							uint32_t exceptionIndex,
+							uint32_t ss,
+							uint32_t esp,
+							uint32_t eflags,
+							uint32_t cs,
+							uint32_t eip,
+							uint32_t errorCode,
 							uint32_t edi,
 							uint32_t esi, 
 							uint32_t ebp, 
@@ -431,45 +441,95 @@ void mostrar_pantalla_debug(uint32_t cr0,
 
 	screen_draw_box(1, 19, 40, 42, 255, C_BG_BLACK);
 	
-	print(excepName[exceptionIndex], 21, 3, C_FG_GREEN);
+	print(excepName[exceptionIndex], 21, 3, C_FG_LIGHT_GREEN);
 	print    ("eax", startX+2, startY+ 5, C_FG_WHITE);
-	print_hex(eax,8, startX+6, startY+ 5, C_FG_GREEN);
+	print_hex(eax,8, startX+6, startY+ 5, C_FG_LIGHT_GREEN);
 
 	print    ("ebx", startX+2, startY+ 7, C_FG_WHITE);
-	print_hex(ebx,8, startX+6, startY+ 7, C_FG_GREEN);
+	print_hex(ebx,8, startX+6, startY+ 7, C_FG_LIGHT_GREEN);
 
 	print    ("ecx", startX+2, startY+ 9, C_FG_WHITE);
-	print_hex(ecx,8, startX+6, startY+ 9, C_FG_GREEN);
+	print_hex(ecx,8, startX+6, startY+ 9, C_FG_LIGHT_GREEN);
 
 	print    ("edx", startX+2, startY+11, C_FG_WHITE);
-	print_hex(edx,8, startX+6, startY+11, C_FG_GREEN);
+	print_hex(edx,8, startX+6, startY+11, C_FG_LIGHT_GREEN);
 
 	print    ("esi", startX+2, startY+13, C_FG_WHITE);
-	print_hex(esi,8, startX+6, startY+13, C_FG_GREEN);
+	print_hex(esi,8, startX+6, startY+13, C_FG_LIGHT_GREEN);
 
 	print    ("edi", startX+2, startY+15, C_FG_WHITE);
-	print_hex(edi,8, startX+6, startY+15, C_FG_GREEN);
+	print_hex(edi,8, startX+6, startY+15, C_FG_LIGHT_GREEN);
 
 	print    ("ebp", startX+2, startY+17, C_FG_WHITE);
-	print_hex(ebp,8, startX+6, startY+17, C_FG_GREEN);
+	print_hex(ebp,8, startX+6, startY+17, C_FG_LIGHT_GREEN);
 
-	print    ("cr0", startX+16, startY+ 6, C_FG_WHITE);
-	print_hex(cr0,8, startX+20, startY+ 6, C_FG_GREEN);
+    print    ("esp", startX+2, startY+19, C_FG_WHITE);
+    print_hex(esp, 8, startX+6, startY+19, C_FG_LIGHT_GREEN);
 
-	print    ("cr2", startX+16, startY+ 8, C_FG_WHITE);
-	print_hex(cr2,8, startX+20, startY+ 8, C_FG_GREEN);	
+    print    ("eip", startX+2, startY+21, C_FG_WHITE);
+    print_hex(eip, 8, startX+6, startY+21, C_FG_LIGHT_GREEN);
 
-	print    ("cr3", startX+16, startY+10, C_FG_WHITE);
-	print_hex(cr3,8, startX+20, startY+10, C_FG_GREEN);
+    print    ("cs", startX+3, startY+23, C_FG_WHITE);
+    print_hex(cs, 8, startX+6, startY+23, C_FG_LIGHT_GREEN);
 
-	print    ("cr4", startX+16, startY+12, C_FG_WHITE);
-	print_hex(cr4,8, startX+20, startY+12, C_FG_GREEN);
+    print    ("ds", startX+3, startY+25, C_FG_WHITE);
+    print_hex(ds, 8, startX+6, startY+25, C_FG_LIGHT_GREEN);
+
+    print    ("es", startX+3, startY+27, C_FG_WHITE);
+    print_hex(es, 8, startX+6, startY+27, C_FG_LIGHT_GREEN);
+  
+    print    ("fs", startX+3, startY+29, C_FG_WHITE);
+    print_hex(fs, 8, startX+6, startY+29, C_FG_LIGHT_GREEN);
+
+    print    ("gs", startX+3, startY+31, C_FG_WHITE);
+    print_hex(gs, 8, startX+6, startY+31, C_FG_LIGHT_GREEN);
+
+	print    ("ss", startX+3, startY+33, C_FG_WHITE);
+	print_hex(ss, 8, startX+6, startY+33, C_FG_LIGHT_GREEN);
+
+	print    ("eflags", startX+2, startY+37, C_FG_WHITE);
+    print_hex(eflags, 8, startX+9, startY+37, C_FG_LIGHT_GREEN);
+
+	print    ("cr0", startX+28, startY+ 6, C_FG_WHITE);
+	print_hex(cr0,8, startX+32, startY+ 6, C_FG_LIGHT_GREEN);
+
+	print    ("cr2", startX+28, startY+ 8, C_FG_WHITE);
+	print_hex(cr2,8, startX+32, startY+ 8, C_FG_LIGHT_GREEN);	
+
+	print    ("cr3", startX+28, startY+10, C_FG_WHITE);
+	print_hex(cr3,8, startX+32, startY+10, C_FG_LIGHT_GREEN);
+
+	print    ("cr4", startX+28, startY+12, C_FG_WHITE);
+	print_hex(cr4,8, startX+32, startY+12, C_FG_LIGHT_GREEN);
+
+	print    ("err", startX+28, startY+14, C_FG_WHITE);
+    print_hex(errorCode, 8, startX+32, startY+14, C_FG_LIGHT_GREEN);
 
 
+    uint32_t* p = (uint32_t *) (esp-12);
+
+    print ("stack", startX+22, startY+18, C_FG_WHITE);
+
+	print_hex(p[0], 8, startX+22, startY+20, C_FG_LIGHT_GREEN);
+	print_hex(p[1], 8, startX+22, startY+22, C_FG_LIGHT_GREEN);
+	print_hex(p[2], 8, startX+22, startY+24, C_FG_LIGHT_GREEN);
+
+	// p = (uint32_t *) (ebp+4);
+	// for (int i = 0; i < 4; ++i) {
+		
+	// }
 
 	while (modo_debug_corriendo == 1){
 		__asm volatile("nop");
 	}
 
 	actualizar_pantalla(); // restauro la pantalla 
+}
+
+uint8_t present_error_code(uint32_t exceptionIndex){
+	uint8_t res = 0;
+	if (exceptionIndex == 8 || ((exceptionIndex >= 10) && (exceptionIndex <= 14)) || exceptionIndex == 17 || exceptionIndex == 30) {		// PERDON 
+		res = 1;
+	}
+	return res;
 }
