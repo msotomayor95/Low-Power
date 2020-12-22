@@ -143,7 +143,7 @@ modoprotegido:
     call mmu_init_kernel_dir
 
     ; .inicializadoDeUnaTarea:
-    ; xchg bx, bx
+    
     ; call init_morty               ; esto devuelve un cr3 de una tarea rick
 
     ; Cargar directorio de paginas
