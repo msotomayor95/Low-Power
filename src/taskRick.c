@@ -3,53 +3,41 @@
 #include "i386.h"
 
 void meeseks1_func(void);
-
-void A(uint32_t llamado);
-void B(uint32_t llamado);
-void C(uint32_t llamado);
-
-uint32_t MAX_LLAMADOS = 10;
-uint32_t llamado = 0;
+void meeseks2_func(void);
 
 void task(void) {
-  while (1) {
-    syscall_meeseeks((uint32_t)&meeseks1_func, 0, 0);
-    llamado++;
-  }
+  syscall_meeseeks((uint32_t)&meeseks1_func, 5, 5);
+  syscall_meeseeks((uint32_t)&meeseks2_func, 6, 6);
+
+  while(1) {
+    __asm volatile("nop");
+  } 
 }
 
 void meeseks1_func(void) {
-  A(llamado);
-  while(1){
-    __asm volatile("nop");
-    
+  // while (1) {
+  //   __asm volatile("nop");
+  // }
+
+  while (1) {
+    for (int i = 0; i < 80; i++) {
+      syscall_move(-1, 0);
+    }
+    syscall_move(0, -1);
   }
 }
 
-
-void A(uint32_t llamado){
-  if(llamado >= MAX_LLAMADOS){
-    uint8_t *p = 0;
-    p[0] = 42;
-  }else{
-    B(llamado+1);
-  }
-}
-
-void B(uint32_t llamado){
-  if(llamado >= MAX_LLAMADOS){
-    uint8_t *p = 0;
-    p[0] = 42;
-  }else{
-    C(llamado+1);
-  }
-}
-
-void C(uint32_t llamado){
-  if(llamado >= MAX_LLAMADOS){
-    uint8_t *p = 0;
-    p[0] = 42;
-  }else{
-    A(llamado+1);
+void meeseks2_func(void) {
+  
+  // while(1) {
+  //   __asm volatile("nop");
+  // }
+  
+  
+  while (1) {
+    for (int i = 0; i < 80; i++) {
+      syscall_move(1, 0);
+    }
+    syscall_move(0, 1);
   }
 }
