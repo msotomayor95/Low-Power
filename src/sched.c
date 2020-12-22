@@ -25,7 +25,7 @@ uint8_t dist_manhattan(uint8_t x1, uint8_t y1, uint8_t x2, uint8_t y2){
 }
 
 void sched_init(void) {
-	modo_debug = 0;
+	modo_debug = 1;
 	modo_debug_corriendo = 0;
 
 	cant_meeseeks_rick = 0;
@@ -514,7 +514,34 @@ void mostrar_pantalla_debug(uint32_t gs,
 	print_hex(p[1], 8, startX+22, startY+22, C_FG_LIGHT_GREEN);
 	print_hex(p[2], 8, startX+22, startY+24, C_FG_LIGHT_GREEN);
 
-	// p = (uint32_t *) (ebp+4);
+	print ("backtrace", startX+22, startY+26, C_FG_WHITE);
+
+	p = (uint32_t *) (ebp);
+	
+	print_hex(0x0, 8, startX+22, startY+28, C_FG_LIGHT_GREEN);
+	print_hex(0x0, 8, startX+22, startY+30, C_FG_LIGHT_GREEN);
+	print_hex(0x0, 8, startX+22, startY+32, C_FG_LIGHT_GREEN);
+	print_hex(0x0, 8, startX+22, startY+34, C_FG_LIGHT_GREEN);
+
+	if (p[1] != 0 && (0x8000000 < p[1] && p[1] < 0x8014000)) {
+		print_hex((uint32_t) p[1], 8, startX+22, startY+28, C_FG_LIGHT_GREEN);
+		p = (uint32_t *) p[0];
+		if (p[1] != 0 && (0x8000000 < p[1] && p[1] < 0x8014000)) {
+			print_hex((uint32_t) p[1], 8, startX+22, startY+30, C_FG_LIGHT_GREEN);
+			p = (uint32_t *) p[0];
+			if (p[1] != 0 && (0x8000000 < p[1] && p[1] < 0x8014000)) {
+				print_hex((uint32_t) p[1], 8, startX+22, startY+32, C_FG_LIGHT_GREEN);
+				p = (uint32_t *) p[0];
+				if (p[1] != 0 && (0x8000000 < p[1] && p[1] < 0x8014000)) {
+					print_hex((uint32_t) p[1], 8, startX+22, startY+34, C_FG_LIGHT_GREEN);
+					p = (uint32_t *) p[0];
+				}
+			}
+		}
+
+	} 
+
+
 	// for (int i = 0; i < 4; ++i) {
 		
 	// }

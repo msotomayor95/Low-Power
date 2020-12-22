@@ -210,46 +210,6 @@ vaddr_t tss_task_init(uint32_t index, vaddr_t code_start, uint8_t x, uint8_t y) 
 
 	gdt[index + GDT_FIRST_MEESEEK].p = 1;								// activo el descriptor del tss correspondiente
 	
-	// print_hex(tss_tasks[tasks_index].ptl, 8, 0, 0, 0xF);
-	// print_hex(tss_tasks[tasks_index].unused0, 8, 0, 1, 0xF);
-	// print_hex(tss_tasks[tasks_index].esp0, 8, 0, 2, 0xF);
-	// print_hex(tss_tasks[tasks_index].ss0, 8, 0, 3, 0xF);
-	// print_hex(tss_tasks[tasks_index].unused1, 8, 0, 4, 0xF);
-	// print_hex(tss_tasks[tasks_index].esp1, 8, 0, 5, 0xF);
-	// print_hex(tss_tasks[tasks_index].ss1, 8, 0, 6, 0xF);
-	// print_hex(tss_tasks[tasks_index].unused2, 8, 0, 7, 0xF);
-	// print_hex(tss_tasks[tasks_index].esp2, 8, 0, 8, 0xF);
-	// print_hex(tss_tasks[tasks_index].ss2, 8, 0, 9, 0xF);
-	// print_hex(tss_tasks[tasks_index].unused3, 8, 0, 10, 0xF);
-	// print_hex(tss_tasks[tasks_index].cr3, 8, 0, 11, 0xF);
-	// print_hex(tss_tasks[tasks_index].eip, 8, 0, 12, 0xF);
-	// print_hex(tss_tasks[tasks_index].eflags, 8, 0, 13, 0xF);
-	// print_hex(tss_tasks[tasks_index].eax, 8, 0, 14, 0xF);
-	// print_hex(tss_tasks[tasks_index].ecx, 8, 0, 15, 0xF);
-	// print_hex(tss_tasks[tasks_index].edx, 8, 0, 16, 0xF);
-	// print_hex(tss_tasks[tasks_index].ebx, 8, 0, 17, 0xF);
-	// print_hex(tss_tasks[tasks_index].esp, 8, 0, 18, 0xF);
-	// print_hex(tss_tasks[tasks_index].ebp, 8, 0, 19, 0xF);
-	// print_hex(tss_tasks[tasks_index].esi, 8, 0, 20, 0xF);
-	// print_hex(tss_tasks[tasks_index].edi, 8, 0, 21, 0xF);
-	// print_hex(tss_tasks[tasks_index].es, 8, 0, 22, 0xF);
-	// print_hex(tss_tasks[tasks_index].unused4, 8, 0, 23, 0xF);
-	// print_hex(tss_tasks[tasks_index].cs, 8, 0, 24, 0xF);
-	// print_hex(tss_tasks[tasks_index].unused5, 8, 0, 25, 0xF);
-	// print_hex(tss_tasks[tasks_index].ss, 8, 0, 26, 0xF);
-	// print_hex(tss_tasks[tasks_index].unused6, 8, 0, 27, 0xF);
-	// print_hex(tss_tasks[tasks_index].ds, 8, 0, 28, 0xF);
-	// print_hex(tss_tasks[tasks_index].unused7, 8, 0, 29, 0xF);
-	// print_hex(tss_tasks[tasks_index].fs, 8, 0, 30, 0xF);
-	// print_hex(tss_tasks[tasks_index].unused8, 8, 0, 31, 0xF);
-	// print_hex(tss_tasks[tasks_index].gs, 8, 0, 32, 0xF);
-	// print_hex(tss_tasks[tasks_index].unused9, 8, 0, 33, 0xF);
-	// print_hex(tss_tasks[tasks_index].ldt, 8, 0, 34, 0xF);
-	// print_hex(tss_tasks[tasks_index].unused10, 8, 0, 35, 0xF);
-	// print_hex(tss_tasks[tasks_index].dtrap, 8, 0, 36, 0xF);
-	// print_hex(tss_tasks[tasks_index].iomap, 8, 0, 37, 0xF);
-	// print_dec(tasks_index, 2, 0, 38, 0xF);
-	// breakpoint();
 	return m_start;
 }
 
