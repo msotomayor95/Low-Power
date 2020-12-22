@@ -25,7 +25,7 @@ uint8_t dist_manhattan(uint8_t x1, uint8_t y1, uint8_t x2, uint8_t y2){
 }
 
 void sched_init(void) {
-	modo_debug = 1;
+	modo_debug = 0;
 	modo_debug_corriendo = 0;
 
 	cant_meeseeks_rick = 0;
