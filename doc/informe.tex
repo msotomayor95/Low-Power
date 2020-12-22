@@ -185,8 +185,78 @@ El ejercicio esta dise\~nado para que podamos ver como escribir en memoria utili
  
 \end{enumerate}
 
+\subsubsection{Ejercicio 2}
 
+\begin{enumerate}[label=\alph*)]
+	\item Completar las entradas necesarias en la IDT para asociar diferentes rutinas a todas las excepciones del procesador. Cada rutina de excepción debe indicar en pantalla qué problema se produjo e interrumpir la ejecución. Posteriormente se modificarán estas rutinas para que se continúe la ejecución, resolviendo el problema y desalojando a la tarea que lo produjo.
+	
+	En el archivo \texttt{idt.c} modificamos la funci\'on \texttt{idt\_init} para inicializar los 20 tipo de excepciones de sistema. Cada entrada tiene seteados los siguientes atributos:
+	
+	\begin{itemize}
+		\item \texttt{off\_set}: La direcci\'on en la cual empieza la rutina de la excepci\'on correspondiente
+		\item \texttt{select\_seg}: El selector de segmento en donde se encuentra la rutina. Tiene que apuntar a un segmento de c\'odigo.
+		\item \texttt{attr}: bits correspondientes a los atributos de una \texttt{IDT\_ENTRY}, como el DPL, el bit de Presente, el tama\~no de la compuerta, entre otras. 
+		
+		Estas interrupciones de excepciones tienen un Selector de segmento apuntando a un segmento de c\'odigo de nivel 0 con un RPL en 00 y un TI en 0. con el bit de Presente en 1 y el tama\~no de la compuerta de 32 bits.
+	\end{itemize}
+	
+	\item Hacer lo necesario para que el procesador utilice la IDT creada anteriormente. Generar una excepción para probarla.
+	
+	En el archivo \texttt{kernel.asm} inicializamos la IDT con la funci\'on \texttt{idt\_init}, para luego setear el puntero a la IDT con LIDT con la variable \texttt{IDT\_DESC}, declarada en \texttt{idt.h}.
+	
+\end{enumerate}
 
+ \subsubsection{Ejercicio 3}
+ 
+ \begin{enumerate}[label=\alph*)]
+ 	\item Completar las entradas necesarias en la \texttt{IDT} para asociar una rutina a la interrupción del reloj y otra a la interrupción de teclado. Además crear cuatro entradas adicionales para las interrupciones de software 88, 89, 100, 123.
+ 	
+ 	%para kyo
+ 	%Agregamos 3 entradas m\'as (la 32, 33 y 47) asociadas a la interrupci\'on de reloj, teclado y software respectivamente.
+ 	
+ 	%Para la interrupci\'on de teclado y de reloj, tendremos un selector de segmento con RPL 00 y TI en 0. Sus atributos son: el bit de presente en 1, el DPL del segmento en 00 y el tama\~no de la compuerta de 32 bits.
+ 	
+ 	%Para la interrupci\'on de software (syscall) tenemos un selector de segmento de c\'odigo de nivel 0 con RPL 00 y TI en 0. El bit de Presente en 1, el DPL del segmento en 11 (para que las tareas con privilegio de usuario, puedan llamar a esta syscall) y un tama\~no de compuerta de 32 bits.
+ 	
+ 	\item Escribir la rutina asociada a la interrupción del reloj, para que por cada \textit{tick} llame a la función \texttt{nextClock}. La misma se encargara de mostrar cada vez que se llame, la animación	de un cursor rotando en la esquina inferior derecha de la pantalla. La función \texttt{nextClock} está definida en \texttt{isr.asm}.
+ 	
+ 	En el archivo \texttt{isr.asm} agregamos la interrupción de reloj, que corresponde a la entrada 32 de la IDT , y consiste en guardar los registros, llamar a la función \texttt{pic\_finish1}, indicando que ya	llegamos a atender la interrupción para llamar luego a \texttt{nextClock}, recuperar los registros y volver de la interrupción con un \texttt{iret}.
+ 	
+ 	\item Escribir la rutina asociada a la interrupción de teclado de forma que si se presiona cualquiera de 0 a 9, se presente la misma en la esquina superior derecha de la pantalla.
+ 	
+ 	
+ 	Modificamos el archivo \texttt{isr.asm} para agregar la interrupci\'on de teclado, que corresponde a la entrada 33 de la IDT , y que consiste en llamar a \texttt{pic\_finish1}, guardar la información de los registros, leer el c\'odigo ingresado por teclado mediante in 0x60, verificar que no sea mayor a 0x80 (es decir, solt\'e la tecla) y llamar a \texttt{print\_hex} creada en el archivo screen.c que de acuerdo al código recibido, imprime la tecla correspondiente en la pantalla . Finalmente recupera la información de los registros y vuelve de la interrupción.
+ 	
+ 	\item Escribir las rutinas asociadas a las interrupciones 88. 89, 100 y 123 para que modifique el valor de eax por 0x58, 0x59, 0x69, y 0x7b, respectivamente. Posteriormente este comportamiento va  ser modificado para atender cada uno de los servicios del sistema.
+ 	
+ 	Estas funciones fueron implementadas en \texttt{isr.asm} y modifican el valor de \texttt{eax} por los valores pedidos, para luego volver de la interrupción.
+ 	
+ \end{enumerate}
+ 
+ \subsubsection{Ejercicio 4}
+ 
+ \begin{enumerate}[label=\alph*)]
+ 	
+ 	\item Escribir las rutinas encargadas de inicializar el directorio y tablas de páginas para el	\textit{kernel}(\texttt{\textbf{mmu_initKernelDir}}). Se debe generar un directorio de páginas que mapee, usando \textit{identity mapping}, las direcciones 0x00000000 a 0x003FFFFF, como ilustra la figura 3. Además, esta función debe inicializar el directorio de páginas en la dirección 0x25000 y las tablas de páginas según muestra la figura 2.
+ 	
+ 	%TENGO QUE SEGUIR A PARTIR DE ACA
+ 	
+ 	Modificamos la función \texttt{mmu\_initKernelDir} del archivo \texttt{mmu.c}, definiendo la primer
+ 	entrada del Directorio de P\'aginas, seteando los bits de \textit{presente} y \textit{read/write} en 1 y seteando la base del la Tabla de p\'aginas en la direcci\'on 0x2C000, mientras que las demás entradas, las inicializamos en 0.
+ 	
+ 	Luego definimos cada entrada de la Tabla de P\'aginas situada en la direcci\'on anteriormente mencionada seteando los bit de \textit{presente} y \textit{read/write} en 1 y definiendo la base usando identity mapping. 
+ 	
+ 	Tanto la entrada del Directorio de P\'aginas que seteamos y como todas las entradas de su Tabla de P\'aginas correspondientes tiene privilegios de supervisor (el bit de \textit{U/S} esta en 0). Tambi\'en cabe aclarar la entrada del Directorio de P\'aginas que seteamos tiene el bit de \textit{PS} (Page Size) en 0, lo que significa que las p\'aginas un tienen tama\~no 4Kb. Con esto logramos tener un direccionamiento de 4Mb de memoria con \textit{identity mapping}.
+ 	
+ 	\item Completar el código necesario para activar paginación.
+ 	
+ 	Modificamos el archivo \texttt{kernel.asm} agregando l\'ineas para modificar el registro \texttt{cr3} (que contiene la base del directorio de la tarea actual, en este caso el kernel), para que este apunte
+ 	a la dirección 0x2700, y activando paginación mediante el seteo del bit de paginación de cr0.
+ 	
+ 	\item Escribir una rutina que imprima el número de libreta de todos los integrantes del grupo en la pantalla.
+ 	
+ 	La funci\'on que imprime las libretas de los integrantes est\'a en el archivo \texttt{screen.h}.
+ \end{enumerate}
  
 \end{document}
 
