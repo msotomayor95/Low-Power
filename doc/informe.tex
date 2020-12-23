@@ -239,22 +239,24 @@ El ejercicio esta dise\~nado para que podamos ver como escribir en memoria utili
  	
  	%TENGO QUE SEGUIR A PARTIR DE ACA
  	
- 	Modificamos la función \texttt{mmu\_initKernelDir} del archivo \texttt{mmu.c}, definiendo la primer
- 	entrada del Directorio de P\'aginas, seteando los bits de \textit{presente} y \textit{read/write} en 1 y seteando la base del la Tabla de p\'aginas en la direcci\'on 0x2C000, mientras que las demás entradas, las inicializamos en 0.
+ 	Modificamos la función \texttt{mmu\_initKernelDir} del archivo \texttt{mmu.c}, definiendo la primer entrada del Directorio de P\'aginas en la direcci\'on \texttt{0x25000}, seteando los bits de \textit{presente}, \textit{read/write} en 1 y la base del la Tabla de p\'aginas en \texttt{0x00026}, mientras que las demás entradas, las inicializamos en 0.
  	
- 	Luego definimos cada entrada de la Tabla de P\'aginas situada en la direcci\'on anteriormente mencionada seteando los bit de \textit{presente} y \textit{read/write} en 1 y definiendo la base usando identity mapping. 
+ 	Luego definimos cada entrada de la Tabla de P\'aginas situada en la direcci\'on anteriormente mencionada seteando los bit de \textit{presente} y \textit{read/write} en 1 y definiendo la base usando identity mapping(cada base corresponde al indice en la tabla). 
  	
- 	Tanto la entrada del Directorio de P\'aginas que seteamos y como todas las entradas de su Tabla de P\'aginas correspondientes tiene privilegios de supervisor (el bit de \textit{U/S} esta en 0). Tambi\'en cabe aclarar la entrada del Directorio de P\'aginas que seteamos tiene el bit de \textit{PS} (Page Size) en 0, lo que significa que las p\'aginas un tienen tama\~no 4Kb. Con esto logramos tener un direccionamiento de 4Mb de memoria con \textit{identity mapping}.
+ 	Tanto la entrada del Directorio de P\'aginas como todas las entradas de su Tabla de P\'aginas correspondientes tiene privilegios de supervisor (el bit de \textit{U/S} esta en 0). Tambi\'en cabe aclarar la entrada del Directorio de P\'aginas que seteamos tiene el bit de \textit{PS} (Page Size) en 0, lo que significa que las p\'aginas tienen tama\~no 4Kb. Con esto logramos tener un direccionamiento de 4Mb de memoria con \textit{identity mapping}.
  	
  	\item Completar el código necesario para activar paginación.
  	
- 	Modificamos el archivo \texttt{kernel.asm} agregando l\'ineas para modificar el registro \texttt{cr3} (que contiene la base del directorio de la tarea actual, en este caso el kernel), para que este apunte
- 	a la dirección 0x2700, y activando paginación mediante el seteo del bit de paginación de cr0.
+ 	Modificamos el archivo \texttt{kernel.asm} agregando l\'ineas para modificar el registro \texttt{cr3} (que contiene la base del directorio de la tarea actual, en este caso el kernel), para que este apunte a la dirección \texttt{0x00025000} y tenga activo el bit de paginación de cr0.
  	
  	\item Escribir una rutina que imprima el número de libreta de todos los integrantes del grupo en la pantalla.
  	
+<<<<<<< HEAD
  	La funci\'on que imprime las libretas de los integrantes est\'a en el archivo \texttt{screen.h}.
  	 
+=======
+ 	La funci\'on \texttt{imprimir\_libretas} se encuentra en \texttt{screen.h} y se encarga de imprimir un bloque negro en el centro de la pantalla con las libretas de los integrantes.
+>>>>>>> 7c74c53b7291eeec5ff354677fc01a68e0984d7b
  \end{enumerate}
  
  \subsubsection{Ejercicio 6}
