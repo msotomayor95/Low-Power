@@ -342,11 +342,12 @@ El ejercicio esta dise\~nado para que podamos ver como escribir en memoria utili
  	Debido a esto separamos la creaci\'on de la tss de una tarea en dos:
  	
  	\begin{itemize}
- 		\item creaci\'on de tss para Rick y Morty: Definimos en la funcion \texttt{tss\_init} los valores tanto para rick como para Morty. Estos se crearan con un nuevo cr3 (con el codigo de las tareas en )
- 		\item creaci\'on de tss para un Mr. Meeseeks: 
+ 		\item creaci\'on de tss para Rick y Morty: Definimos en la funcion \texttt{tss\_init} los valores tanto para rick como para Morty. Estos se crearan con un nuevo cr3 (con el codigo de las tareas mapeado en la direccion virtual 0x1D00000), con la pila en la direccion virtual 0x1D04000 y los selectores de segmento con RPL 3, salvo el ss0 que necesitamos que sea un segmento de datos de nivel 0. 
+ 		
+ 		El con esp empezar\'a en la base de la nueva pagina libre que nos devuelve \texttt{mmu\_next\_free\_kernel\_page()}
+ 		\item creaci\'on de tss para un Mr. Meeseeks: Se explayara mas sobre esto, mas adelante. 
  	\end{itemize}
  
- 	% falta terminar esto. Lo sigo mañana.
  \end{enumerate}
  
 \end{document}
