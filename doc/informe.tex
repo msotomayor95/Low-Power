@@ -68,7 +68,7 @@
 \fancyhf{}
 
 \fancyhead[LO]{Sección \rightmark} % \thesection\ 
-\fancyfoot[LO]{\small{Leandro Ezequiel Ruiz, Walter Tejera, Marco Sotomayor}}
+\fancyfoot[LO]{\small{Walter Tejera, Marco Sotomayor}}
 \fancyfoot[RO]{\thepage}
 \renewcommand{\headrulewidth}{0.5pt}
 \renewcommand{\footrulewidth}{0.5pt}
@@ -134,8 +134,7 @@ Disk como dispositivo de booteo. En el primer sector de dicho floppy, se almacen
 sector. El BIOS se encarga de copiar a memoria 512 bytes del sector, a partir de la dirección
 0x7C00. Luego, se comienza a ejecutar el código a partir esta dirección. El boot-sector debe
 encontrar en el floppy el archivo kernel.bin y copiarlo a memoria. Éste se copia a partir
-de la dirección 0x1200, y luego se ejecuta a partir de esa misma dirección. En la figura 2 se
-presenta el mapa de organización de la memoria utilizada por el kernel.
+de la dirección 0x1200, y luego se ejecuta a partir de esa misma dirección.
 
 Es importante tener en cuenta que el código del boot-sector se encarga exclusivamente de
 copiar el kernel y dar el control al mismo, es decir, no cambia el modo del procesador. El
@@ -190,12 +189,12 @@ El ejercicio esta dise\~nado para que podamos ver como escribir en memoria utili
 \begin{enumerate}[label=\alph*)]
 	\item Completar las entradas necesarias en la IDT para asociar diferentes rutinas a todas las excepciones del procesador. Cada rutina de excepción debe indicar en pantalla qué problema se produjo e interrumpir la ejecución. Posteriormente se modificarán estas rutinas para que se continúe la ejecución, resolviendo el problema y desalojando a la tarea que lo produjo.
 	
-	En el archivo \texttt{idt.c} modificamos la funci\'on \texttt{idt\_init} para inicializar los 20 tipo de excepciones de sistema. Cada entrada tiene seteados los siguientes atributos:
+	En el archivo \texttt{idt.c} modificamos la funci\'on \texttt{idt\_init} para inicializar los 31 (0-30) tipo de excepciones de sistema. Cada entrada tiene seteados los siguientes atributos:
 	
 	\begin{itemize}
 		\item \texttt{off\_set}: La direcci\'on en la cual empieza la rutina de la excepci\'on correspondiente
-		\item \texttt{select\_seg}: El selector de segmento en donde se encuentra la rutina. Tiene que apuntar a un segmento de c\'odigo.
-		\item \texttt{attr}: bits correspondientes a los atributos de una \texttt{IDT\_ENTRY}, como el DPL, el bit de Presente, el tama\~no de la compuerta, entre otras. 
+		\item \texttt{select\_seg}: El selector de segmento con el que se correr\'a la rutina. Tiene que apuntar a un segmento de c\'odigo.
+		\item \texttt{attr}: bits correspondientes a los atributos de una \texttt{IDT\_ENTRY}, como el DPL, el bit de Presente, el tama\~no de la compuerta, entre otras.
 		
 		Estas interrupciones de excepciones tienen un Selector de segmento apuntando a un segmento de c\'odigo de nivel 0 con un RPL en 00 y un TI en 0. con el bit de Presente en 1 y el tama\~no de la compuerta de 32 bits.
 	\end{itemize}
@@ -211,12 +210,11 @@ El ejercicio esta dise\~nado para que podamos ver como escribir en memoria utili
  \begin{enumerate}[label=\alph*)]
  	\item Completar las entradas necesarias en la \texttt{IDT} para asociar una rutina a la interrupción del reloj y otra a la interrupción de teclado. Además crear cuatro entradas adicionales para las interrupciones de software 88, 89, 100, 123.
  	
- 	%para kyo
- 	%Agregamos 3 entradas m\'as (la 32, 33 y 47) asociadas a la interrupci\'on de reloj, teclado y software respectivamente.
+ 	Agregamos 3 entradas m\'as (la 32, 33 y 47) asociadas a la interrupci\'on de reloj, teclado y software respectivamente.
  	
- 	%Para la interrupci\'on de teclado y de reloj, tendremos un selector de segmento con RPL 00 y TI en 0. Sus atributos son: el bit de presente en 1, el DPL del segmento en 00 y el tama\~no de la compuerta de 32 bits.
+ 	Para la interrupci\'on de teclado y de reloj, tendremos un selector de segmento con RPL 00 y TI en 0. Sus atributos son: el bit de presente en 1, el DPL del segmento en 00 y el tama\~no de la compuerta de 32 bits.
  	
- 	%Para la interrupci\'on de software (syscall) tenemos un selector de segmento de c\'odigo de nivel 0 con RPL 00 y TI en 0. El bit de Presente en 1, el DPL del segmento en 11 (para que las tareas con privilegio de usuario, puedan llamar a esta syscall) y un tama\~no de compuerta de 32 bits.
+ 	Para la interrupci\'on de software (syscall) tenemos un selector de segmento de c\'odigo de nivel 0 con RPL 00 y TI en 0. El bit de Presente en 1, el DPL del segmento en 11 (para que las tareas con privilegio de usuario, puedan llamar a esta syscall) y un tama\~no de compuerta de 32 bits.
  	
  	\item Escribir la rutina asociada a la interrupción del reloj, para que por cada \textit{tick} llame a la función \texttt{nextClock}. La misma se encargara de mostrar cada vez que se llame, la animación	de un cursor rotando en la esquina inferior derecha de la pantalla. La función \texttt{nextClock} está definida en \texttt{isr.asm}.
  	
@@ -253,7 +251,9 @@ El ejercicio esta dise\~nado para que podamos ver como escribir en memoria utili
  	
  	\item Escribir una rutina que imprima el número de libreta de todos los integrantes del grupo en la pantalla.
  	
+ 	
  	La funci\'on \texttt{imprimir\_libretas} se encuentra en \texttt{screen.h} y se encarga de imprimir un bloque negro en el centro de la pantalla con las libretas de los integrantes.
+
  \end{enumerate}
  
  \subsubsection{Ejercicio 5}
@@ -296,6 +296,56 @@ El ejercicio esta dise\~nado para que podamos ver como escribir en memoria utili
  	
  
  	
+ \end{enumerate}
+ 
+
+ \subsubsection{Ejercicio 6}
+ 
+ \begin{enumerate}[label=\alph*)]
+ 	\item Definir las entradas en la GDT que considere necesarias para ser usadas como  descriptores de TSS. M\'inimamente, una para ser utilizada por la tarea inicial y otra para la tarea idle.
+ 	
+ 	En en archivo \texttt{gdt.c} agregamos 24 nuevas entradas de la GDT. Las primeras dos son para la tarea inicial y la tarea idle, las siguientes dos son para Rick y Morty y las ultimas 20 son las tss correspondientes a los Mr. Meeseeks de cada jugador.
+ 	
+ 	Estas entradas tendr\'an un offset l\'imite de 103 bytes y el bit de granularidad en 0, haciendo que se puedan acceder a 104 bytes del segmento de TSS. Todos tienen un DPL en 00 ya que solo quiero que el Kernel tenga acceso a estos segmentos. Las tss de las tareas inicial, idle, Rick y Morty tendran el bit de presente en 1, mientras que las de los Mr. Meeseeks permaneceran en 0 hasta que sean creadas por algun jugador.
+ 	
+ 	\item Completar la entrada de la \texttt{TSS} de la tarea \texttt{Idle} con la información de la tarea \texttt{Idle}. Esta información se encuentra en el archivo \texttt{tss.c}. La tarea \texttt{Idle} se encuentra en la dirección	0x00018000. La pila se alojará en la misma dirección que la pila del kernel y será mapeada con identity mapping. Esta tarea ocupa 1 página de 4KB y debe ser mapeada con identity mapping. Además, la misma debe compartir el mismo CR3 que el kernel.
+ 	
+ 	Definimos en \texttt{tss.c} la variable \texttt{tss\_iddle} que toma el cr3 actual mediante la funcion \texttt{rcr3()}, con la misma pila que nuestro kernel (0x25000), el eip en 0x18000. Luego, le seteamos los selectores de segmento de la siguiente forma:
+ 	
+ 	\begin{itemize}
+ 		\item \texttt{es}: GDT\_IDX\_DATA\_0 $\ll$ 3
+ 		\item \texttt{cs}: GDT\_IDX\_CODE\_0 $\ll$ 3
+ 		\item \texttt{ss}: GDT\_IDX\_DATA\_0 $\ll$ 3
+ 		\item \texttt{ds}: GDT\_IDX\_DATA\_0 $\ll$ 3
+ 		\item \texttt{fs}: GDT\_IDX\_DATA\_0 $\ll$ 3
+ 		\item \texttt{gs}: GDT\_IDX\_DATA\_0 $\ll$ 3
+ 	\end{itemize}
+ 	 
+ 	
+ 	Tanto GDT\_IDX\_DATA\_0 como GDT\_IDX\_CODE\_0 son reemplazos sintacticos definidos en defines.h con los indices al segmento de datos y codigo de nivel 0 respectivamente.
+ 	
+ 	\item Completar la entrada de la GDT correspondiente a la tarea \textit{inicial}.
+ 	\item Completar la entrada de la GDT correspondiente a la tarea \textit{idle}.
+ 	
+ 	En estos dos ejercicios, usamos la funcion \texttt{tss\_init()} la cual setea las bases de las tss en la gdt, ya que no pueden resolverse en tiempo de compilaci\'on.
+ 	
+ 	\item Escribir el código necesario para ejecutar la tarea \texttt{Idle}, es decir, saltar intercambiando las \texttt{TSS}, entre la tarea inicial y la tarea \texttt{Idle}.
+ 	
+ 	En \texttt{kernel.asm}, realizamos un \texttt{jmp far} a la entrada de la GDT donde se encuentra ubicado el descriptor de la TSS de la tarea Idle con offset 0.
+ 	
+ 	\item Construir una función que complete una TSS con los datos correspondientes a una tarea. Esta función será utilizada más adelante para crear una tarea. El código de las tareas se encuentra a partir de la dirección 0x00010000 ocupando cuatro páginas de 4kb cada una según indica la figura 2. Para la dirección de la pila se debe utilizar el mismo espacio de la tarea, la misma crecerá
+ 	desde la base del código de la tarea. Para el mapa de memoria se debe construir uno nuevo utilizando la función \texttt{mmu\_init\_task\_dir}. Además, tener en cuenta que cada tarea utilizará una pila distinta de nivel 0, para esto se debe pedir una nueva página del área libre de kernel a tal f\'in.
+ 	
+ 	Para este ejercicio, tendremos un array de tss, llamado \texttt{tss\_tasks} de 22 posiciones, correspondientes a Rick, Morty y a los Mr Meeseeks de cada uno. Rick y morty estaran en \texttt{tss\_tasks[0]} y \texttt{tss\_tasks[1]} mientras que los Mr. Meeseeks estar\'an e las posiciones restantes. En las posiciones pares, tendremos a los Mr. Meeseeks de Rick y en las impares los de Morty. 
+ 	
+ 	Debido a esto separamos la creaci\'on de la tss de una tarea en dos:
+ 	
+ 	\begin{itemize}
+ 		\item creaci\'on de tss para Rick y Morty: Definimos en la funcion \texttt{tss\_init} los valores tanto para rick como para Morty. Estos se crearan con un nuevo cr3 (con el codigo de las tareas en )
+ 		\item creaci\'on de tss para un Mr. Meeseeks: 
+ 	\end{itemize}
+ 
+ 	% falta terminar esto. Lo sigo mañana.
  \end{enumerate}
  
 \end{document}

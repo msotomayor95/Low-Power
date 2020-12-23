@@ -159,14 +159,6 @@ vaddr_t tss_task_init(uint32_t index, vaddr_t code_start, uint8_t x, uint8_t y) 
 	vaddr_t m_start = init_meeseek(index, code_start, x, y);	// creo la tarea, mapeando en memoria virtual lo necesario
 	uint32_t stack0_index = index; 
 	uint32_t tasks_index = index + BASE_TSS_TASKS_MEESEEKS;
-
-	// solo hay unos campos que difieren del meeseek con su creador
-	// selecciono una pagina de 20 que tenia previamente inicializadas
-	
-
-	// dir virtual mapeada a la primera de las 2 paginas de la tarea
-	
-	// dir virtual mapeada a la direccion de la segunda pagina de la tarea
 	
 
 	tss_tasks[tasks_index].ptl = 0;
