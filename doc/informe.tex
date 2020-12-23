@@ -239,9 +239,9 @@ El ejercicio esta dise\~nado para que podamos ver como escribir en memoria utili
  	
  	\item Escribir las rutinas encargadas de inicializar el directorio y tablas de páginas para el	\textit{kernel}(\texttt{\textbf{mmu_initKernelDir}}). Se debe generar un directorio de páginas que mapee, usando \textit{identity mapping}, las direcciones 0x00000000 a 0x003FFFFF, como ilustra la figura 3. Además, esta función debe inicializar el directorio de páginas en la dirección 0x25000 y las tablas de páginas según muestra la figura 2.
  	
- 	%TENGO QUE SEGUIR A PARTIR DE ACA
- 	
- 	Modificamos la función \texttt{mmu\_initKernelDir} del archivo \texttt{mmu.c}, definiendo la primer entrada del Directorio de P\'aginas en la direcci\'on \texttt{0x25000}, seteando los bits de \textit{presente}, \textit{read/write} en 1 y la base del la Tabla de p\'aginas en \texttt{0x00026}, mientras que las demás entradas, las inicializamos en 0.
+ 
+ 	Creamos dos structs: \texttt{tr\_page\_directory\_entry} y \texttt{str\_page\_table\_entry} que mediante metodos modelan un cada campo de un directorio de paginas y una tabla de paginas respectivamente.
+ 	Modificamos la función \texttt{mmu\_initKernelDir} del archivo \texttt{mmu.c}, definiendo la primer entrada del Directorio de P\'aginas en la direcci\'on \texttt{0x00025000}, seteando los bits de \textit{presente}, \textit{read/write} en 1 y la base del la Tabla de p\'aginas en \texttt{0x00026}, mientras que las demás entradas, las inicializamos en 0.
  	
  	Luego definimos cada entrada de la Tabla de P\'aginas situada en la direcci\'on anteriormente mencionada seteando los bit de \textit{presente} y \textit{read/write} en 1 y definiendo la base usando identity mapping(cada base corresponde al indice en la tabla). 
  	
@@ -254,6 +254,48 @@ El ejercicio esta dise\~nado para que podamos ver como escribir en memoria utili
  	\item Escribir una rutina que imprima el número de libreta de todos los integrantes del grupo en la pantalla.
  	
  	La funci\'on \texttt{imprimir\_libretas} se encuentra en \texttt{screen.h} y se encarga de imprimir un bloque negro en el centro de la pantalla con las libretas de los integrantes.
+ \end{enumerate}
+ 
+ \subsubsection{Ejercicio 5}
+ 
+ \begin{enumerate}[label=\alph*)]
+ 	\item Escribir una rutina (\texttt{mmu\_init}) que se encargue de inicializar las estructuras necesarias para administrar la memoria en el área libre de kernel.
+ 	
+ 	La función solo se encarga de inicializar la variable \texttt{next\_free\_kernel\_page},
+ 	y se encuentra en el archivo \texttt{mmu.c}.
+ 	
+ 		\item Escribir dos rutinas encargadas de mapear y desmapear páginas de memoria.
+ 	\begin{enumerate}[label=\Roman{*}-]
+ 		\item \texttt{mmu\_mapPage(uint32\_t virtual, uint32\_t cr3, uint32\_t phy)}\\
+ 		Permite mapear la página f\'isica correspondiente a phy en la dirección virtual virtual	utilizando cr3.\\
+ 		
+ 		Agregamos dos parametros a la funci\'on: \texttt{\uint8\_t rw} y \texttt{\uint8\_t us}
+ 		Esta función, implementada en el archivo \texttt{mmu.c}, toma una dirección de memoria virtual,
+ 		una de memoria f\'isica, un cr3, rw y us. 
+ 		
+ 		Primero revisa que esté el bit de presente en 1 en la
+ 		entrada que marca la dirección virtual del Page Directory correspondiente al cr3, y en 
+ 		caso de no estarlo, la inicializa, utilizando una nueva página libre del area libre del kernel para crear
+ 		su correspondiente Page Table. 
+ 		
+ 		Luego busca la entrada del Page Table  y la	inicializa, de modo que mapea a la dirección de memoria f\'isica pasada por argumento. Siempre seteando los bits de privilegios y permisos de lectura y escritura de manera acorde a los valores pasados por par\'ametro.\\
+ 		
+ 		\item \texttt{mmu\_unmapPage(uint32\_t cr3, uint32\_t virtual)} \\
+ 		Borra el mapeo creado en la dirección virtual virtual utilizando cr3.\\
+ 		
+ 		Esta otra función, también implementada en el archivo \texttt{mmu.c}, simplemente limpia el bit de presente de la entrada del Page Table, de la correspondiente entrada del Page Directory del cr3 pasado por argumento.
+ 		
+ 	\end{enumerate}
+ 	
+ 	\item Escribir una rutina (\texttt{mmu\_init\_task\_dir}) encargada de inicializar un directorio de páginas y tablas de páginas para una tarea, respetando la figura 3. La rutina debe mapear 4 p\'aginas virtuales para la tarea Rick o Morty, a partir de la dirección virtual 0x1D00000. Esta función debe encargarse de copiar el codigo de la tarea desde la memoria del kernel a la pagina física correspondiente(0x1D00000 para Rick y 0x1D04000 para Morty). Sugerencia agregar a esta función todos los parámetros que considere necesarios.
+ 	
+ 	Agregamos la función \texttt{mmu\_init\_task\_dir} en el archivo \texttt{mmu.c}, que toma los siguientes parametros: \texttt{paddr\_t phy\_start, paddr\_t code\_start, size\_t pages, vaddr\_t v\_start, uint8\_t rw, uint8\_t user\_supervisor}. 
+	Define un nuevo Directorio de P\'aginas (pidientdo una nueva p\'agina del \'area libre del kernel), realiza identity mapping en la parte de la memoria destinada al kernel y al \'area libre del kernel. Se mapea \texttt{v\_start} a \texttt{phy\_start} tanto el cr3 actual como en el nuevo. Utilizando el cr3 actual  se escribe el codigo de la tarea (\texttt{code\_start}) a travez de \texttt{v\_start}. Luego se desmapea \texttt{v\_start} del cr3 actual. La función devuelve el nuevo cr3.
+	
+	\item A modo de prueba, construir un mapa de memoria para tareas e intercambiarlo con el del kernel, luego cambiar el color de fondo de la pantalla y volver a la normalidad. Este item no debe estar implementado en la soluci\'on final.
+ 	
+ 
+ 	
  \end{enumerate}
  
 \end{document}
