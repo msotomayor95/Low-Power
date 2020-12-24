@@ -69,7 +69,6 @@ uint16_t sched_next_task(void) {
 		}
 		if (i < 20) {
 			tarea_actual = i+2;
-			// reducir_dist_maxima(i);
 		} else {
 			tarea_actual = 0;
 		}
