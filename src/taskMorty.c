@@ -1,5 +1,4 @@
 #include "syscall.h"
-#include "i386.h"
 
 void meeseks1_func(void);
 
@@ -17,27 +16,27 @@ void meeseks1_func(void) {
     __asm volatile("nop");
   }
 
-  // int8_t deltax, deltay;
+  int8_t deltax, deltay;
 
-  // while (true) {
-  //   syscall_look(&deltax, &deltay);
-  //   syscall_move(deltax, deltay);
-  //   continue;
-  //   while (deltax < 0) {
-  //     syscall_move(-1, 0);
-  //     deltax++;
-  //   }
-  //   while (deltay < 0) {
-  //     syscall_move(0, -1);
-  //     deltay++;
-  //   }
-  //   while (deltax > 0) {
-  //     syscall_move(1, 0);
-  //     deltax--;
-  //   }
-  //   while (deltay > 0) {
-  //     syscall_move(0, 1);
-  //     deltay--;
-  //   }
-  // }
+  while (true) {
+    syscall_look(&deltax, &deltay);
+    syscall_move(deltax, deltay);
+    continue;
+    while (deltax < 0) {
+      syscall_move(-1, 0);
+      deltax++;
+    }
+    while (deltay < 0) {
+      syscall_move(0, -1);
+      deltay++;
+    }
+    while (deltax > 0) {
+      syscall_move(1, 0);
+      deltax--;
+    }
+    while (deltay > 0) {
+      syscall_move(0, 1);
+      deltay--;
+    }
+  }
 }
