@@ -414,6 +414,12 @@ El ejercicio esta dise\~nado para que podamos ver como escribir en memoria utili
 	
 	\item Implementar la lógica de la rutina \texttt{look} (100) para buscar \texttt{Mega Semillas}.
 	
+	Esta interrupcion depende de dos funciones en \texttt{sched.c}: \texttt{semilla\_x} y \texttt{semilla\_y}.
+	
+	En ambas funciones se recorren todas las semillas no consumidas del mapa y se calcula la distancia manhattan con respecto al meeseek invocador de este servicio, devolviendo la la coordenada x o y (depende de la funci\'on) de la semilla de menor distancia al meeseek.
+	
+	Dado que nuestro mapa es de 40 * 80 cuadrados y los meeseeks no realizan movimiento diagonal. Si queremos saber la distancia entre dos objetos dentro del mapa basta con tomar la diferencia absoluta entre sus coordenadas horizontales (abs(meeseek.x - semilla.x)) y sumarla a la diferencia absoluta entre sus coordenadas verticales (abs(meeseek.y - semilla.y)). A esta distancia se la conoce como distancia manhattan.
+	
 	\item Implementar la lógica de la rutina \texttt{user\_portal\_gun} (89) para usar el arma de portales.
 	
 	\item Agregar restricciones de movimiento a la syscall mover.
