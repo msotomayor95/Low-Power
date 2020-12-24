@@ -414,6 +414,14 @@ El ejercicio esta dise\~nado para que podamos ver como escribir en memoria utili
 	
 	\item Implementar la lógica de la rutina de interrupciones move (123) para mover a un Meeseeks. Verificar que el remapeo y asimilación de semillas se realice de forma correcta. Comenzar implementando sin restricciones de movimiento.
 	
+	Para este punto, checkeamos en la rutina de interrupciones que la syscall no sea llamado por Rick o Morty. De ser asi, se da por ganador a el jugador contrario y se termina el juego de manera inmediata.
+	
+	En el caso que haya sido llamado por un Mr Meeseek, se llamara a la funci\'on \texttt{mover\_meeseek} con las coordenadas pasadas por parametro.
+	
+	Esta funci\'on calcular\'a la direcci\'on tanto en x como en y nuevas, teniendo en cuenta que el wrap around esta permitido. Se checkear\'a si en estas nuevas coordenadas tenemos una mega semilla para asimilar. De ser asi, despues de asimilarla, se matar al meeseek en cuesti\'on. De no haber una semilla, se pasar\'a a mover el codigo de Mr. Meeseek a la nueva posici\'on del mapa usando la funci\'on \texttt{mover\_codigo\_meeseek}.
+	
+	Esta funci\'on calculara la nueva direcci\'on fisica en la que debo correr el meeseek, y mapeara el codigo viejo a esta nueva direccion. Para hacer, mapeamos de manera temporal en el cr3 actual, la direcci\'on fisica previamente mencionada usando identity mapping para copiar el codigo del meeseek, luego desmapeamos la direccion y luego remapeamos la nuevoa direccion fisica a la virtual que teniamos antes, concluyendo as\'i la logica para mover un meeseek.
+		
 	\item Implementar la lógica de la rutina \texttt{look} (100) para buscar \texttt{Mega Semillas}.
 	
 	Esta interrupcion depende de dos funciones en \texttt{sched.c}: \texttt{semilla\_x} y \texttt{semilla\_y}.
@@ -424,9 +432,23 @@ El ejercicio esta dise\~nado para que podamos ver como escribir en memoria utili
 	
 	\item Implementar la lógica de la rutina \texttt{user\_portal\_gun} (89) para usar el arma de portales.
 	
+	En la rutina, verificamos que la syscall no sea llamada por un jugador. De ser asi, se da por ganador al jugador contrario y se termina el juego de forma inmediata.
+	
+	Tambien verificamos que el meesseek no use mas de una vez el portal gun, debido a la restriccion del trabajo.
+	
+	Finalmente, si es su primera vez usando el portal gun, usaremos la funci\'on \texttt{rand()}, para generar valores aleatorios y usaremos la funcion move\_meeseek para moverlos con esas coordenadas.
+	
 	\item Agregar restricciones de movimiento a la syscall mover.
 	
+	Agregamos a los meeseeks un atributo que da la distancia m\'axima que pueden recorrer los meeseeks. Empezando todos con 7 cuando se crean. Y tenemos un array de ticks de reloj que contabilizan cuantos ticks llevan. Cuando se crean un meeseeks el tick de reloj correspondiente a este meeseek con 2. Y cada vez que se acaba su tick de reloj, bajamos us distancia m\'axima en 1, hasta un m\'inimo de 1, y restauramos sus ticks de reloj.
+	
+	En la syscall move, checkeamos antes de proseguir con el c\'odigo que la distancia que debemos movernos no exceda la distancia m\'axima.
+	
 	\item Implementar la lógica de finalización del juego.
+	
+	Para terminar el juego, tenemos las verificaciones en las excepciones y en las syscalls. Para una finalizacion que no tengan que ver con lo mencionado anteriormente, tendremos un sistema de puntajes.
+	
+	Como dijimos anteriormente, cuando se crea un Mr Meeseek o un Mr Meeseek se mueve y estan parados en una Mega semilla, estas son asimiladas (no creando el meeseek o matandolo segun corresponda) y se da el puntaje al jugador due\~no del Meeseek. Ahora, ademas de eso, verificaremos que todas las semillas hayan sido encontradas. De ser asi, el juego finaliza sentenciando al ganador segun el puntaje de cada uno. Si ambos tienen el mismo puntaje, se considera un empate. De cualquiera de las 3 formas (Gana Rick, Gana Morty, Empate) el juego termina.
 	
 \end{enumerate}
 
