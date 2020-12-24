@@ -337,7 +337,7 @@ El ejercicio esta dise\~nado para que podamos ver como escribir en memoria utili
  	\item Construir una función que complete una TSS con los datos correspondientes a una tarea. Esta función será utilizada más adelante para crear una tarea. El código de las tareas se encuentra a partir de la dirección 0x00010000 ocupando cuatro páginas de 4kb cada una según indica la figura 2. Para la dirección de la pila se debe utilizar el mismo espacio de la tarea, la misma crecerá
  	desde la base del código de la tarea. Para el mapa de memoria se debe construir uno nuevo utilizando la función \texttt{mmu\_init\_task\_dir}. Además, tener en cuenta que cada tarea utilizará una pila distinta de nivel 0, para esto se debe pedir una nueva página del área libre de kernel a tal f\'in.
  	
- 	Para este ejercicio, tendremos un array de tss, llamado \texttt{tss\_tasks} de 22 posiciones, correspondientes a Rick, Morty y a los Mr Meeseeks de cada uno. Rick y morty estaran en \texttt{tss\_tasks[0]} y \texttt{tss\_tasks[1]} mientras que los Mr. Meeseeks estar\'an e las posiciones restantes. En las posiciones pares, tendremos a los Mr. Meeseeks de Rick y en las impares los de Morty. 
+ 	Para este ejercicio, tendremos un array de tss, llamado \texttt{tss\_tasks} de 22 posiciones, correspondientes a Rick, Morty y a los Mr Meeseeks de cada uno. Rick y morty estaran en \texttt{tss\_tasks[0]} y \texttt{tss\_tasks[1]} mientras que los Mr. Meeseeks estar\'an en las posiciones restantes. En las posiciones pares, tendremos a los Mr. Meeseeks de Rick y en las impares los de Morty. 
  	
  	Debido a esto separamos la creaci\'on de la tss de una tarea en dos:
  	
@@ -345,7 +345,7 @@ El ejercicio esta dise\~nado para que podamos ver como escribir en memoria utili
  		\item creaci\'on de tss para Rick y Morty: Definimos en la funcion \texttt{tss\_init} los valores tanto para rick como para Morty. Estos se crearan con un nuevo cr3 (con el codigo de las tareas mapeado en la direccion virtual 0x1D00000), con la pila en la direccion virtual 0x1D04000 y los selectores de segmento con RPL 3, salvo el ss0 que necesitamos que sea un segmento de datos de nivel 0. 
  		
  		El con esp empezar\'a en la base de la nueva pagina libre que nos devuelve \texttt{mmu\_next\_free\_kernel\_page()}
- 		\item creaci\'on de tss para un Mr. Meeseeks: Se explayara mas sobre esto, mas adelante. 
+ 		\item creaci\'on de tss para un Mr. Meeseeks: Se explayara mas sobre esto mas adelante. 
  	\end{itemize}
  
  \end{enumerate}
@@ -355,28 +355,35 @@ El ejercicio esta dise\~nado para que podamos ver como escribir en memoria utili
 \begin{enumerate}[label=\alph*)]
 	\item Construir una función para inicializar las estructuras de datos del scheduler.
 	
-	En \texttt{sched\_init} se inicializan variables globales que controlan los puntajes, la cantidad de meeseeks activos y 2 arrays uno de semillas y el otro de meeseeks. Cada elemento contiene una instancia de semilla o meeseek. En el caso de meeseeks, tenemos en cuenta sus coordenadas, si uso o no la portal gun, distancia actual de movimiento por turno y la cantidad de ticks de reloj dedicados a ese meeseek. Una semilla se compone de sus coordenadas en el mapa y si fue asimilada o no. Por \'ultimo esta funci\'on se encarga de imprimir las semillas en pantalla.
+	En \texttt{sched\_init} se inicializan variables globales que controlan los puntajes, la cantidad de meeseeks activos, la tarea actual que esta corriendo y 2 arrays uno de semillas y el otro de meeseeks. Cada elemento de los array contiene una instancia de semilla o meeseek respectivamente. En el caso de meeseeks, tenemos en cuenta sus coordenadas, si uso o no la portal gun, distancia actual de movimiento por turno y la cantidad de ticks de reloj dedicados a ese meeseek. Una semilla se compone de sus coordenadas en el mapa y si fue asimilada o no. Por \'ultimo esta funci\'on se encarga de imprimir las semillas en pantalla.
 	
 	\item Crear la función \texttt{sched\_next\_task()} que devuelve el indice en la GDT de la próxima tarea a ser ejecutada. Construir la rutina de forma que devuelva una tarea por cada jugador por vez según se explica en la sección 0.4.3.
 	
-	La funci\'on fue implementada en \texttt{sched.c} y se llama desde la interrupción de reloj. Si la tarea actual es un meeseeks se reduce la distancia m\'axima de movimiento. Devuelve el selector de segmento de la siguiente tarea.
+	La funci\'on fue implementada en \texttt{sched.c} y se llama desde la interrupción de reloj. Devuelve el selector de segmento de la siguiente tarea, en este caso Rick o Morty.
 	    
 	\item Modificar el código necesario para que se realice el intercambio de tareas por cada ciclo de reloj. Cargar las tareas Rick y Morty y verificar que se ejecuten (escriben su reloj cuando están activas, ejecutar system calls de prueba). El intercambio se realizara según indique la función \texttt{sched\_next\_task()}.
 	
-	En \texttt{kernel.asm} cargamos la tss de la \texttt{tarea inicial} con \texttt{ltr} y a continuaci\'on saltamos a la tarea \texttt{Idle}. Una vez termine el quantum llegara la interrupción de reloj desde donde se llamara a \texttt{sched\_next\_task()}
+	En \texttt{kernel.asm} cargamos la tss de la \texttt{tarea inicial} con \texttt{ltr} y a continuaci\'on saltamos a la tarea \texttt{Idle}. Una vez termine el quantum llegar\'a la interrupción de reloj desde donde se llamara a \texttt{sched\_next\_task()}. El resultado devuelto es comparado para saber si la proxima tarea a saltar es la misma que estoy corriendo actualmente. De ser asi, obviamos el intermcabio de tareas, ya que se produciria un error porque el descriptor de tss a la que apunta el resultado de \texttt{sched\_next\_task()} tiene el bit de busy en 1. De ser distintos, pasamos a hacer el jump far al descriptor de tss que nos devolvio esta funci\'on.
 	
 	\item Modificar las rutinas de interrupciones 88, 89, 100 y 123, para que pasen a la tarea idle cuando son invocadas. Verificar que la tarea idle se ejecuta (escribe su reloj).
 	
-	En cada interrupci\'on pedida realizamos un jump far al selector de segmento de la tss idle. 
+	En cada interrupci\'on pedida realizamos un jump far al selector de segmento de la tss idle con RPL 0.
 	
 	\item Modificar las rutinas de excepciones del procesador para que desalojen a la tarea que estaba corriendo y ejecuten la próxima. En caso de que se desaloje una tarea principal, el juego finaliza.
 	
-	En el caso de que uno de los 2 jugadores gane, se imprime un mensaje informando al ganador y no se realizan mas acciones en el campo. 
+	Modificamos las rutinas de excepciones para que en el caso de que uno de los 2 jugadores cometa la excepcion, se imprime un mensaje informando al ganador (el jugador contrario al que realizo la excepci\'on) y no se realizan mas acciones en el campo. 
 	
-	Si un meeseeks genera la excepci\'on se busca la tss asociada y se cambia el bit de presente a 0 luego se desmapean las 2 p\'aginas de memoria anteriormente asignadas. 
+	%Si un meeseeks genera la excepci\'on se busca la tss asociada y se cambia el bit de presente a 0 luego se desmapean las 2 p\'aginas de memoria anteriormente asignadas.
 	
 	\item Implementar el mecanismo de debugging explicado en la sección 0.4.4 que indicara en pantalla la razón del desalojo de una tarea. 
 	
+	Para este punto, tendremos dos variables mas llamadas \texttt{modo\_debug} y \texttt{modo\_debug\_corriendo}. El primero se usara para tener un control de si esta activado o no el modo de bug, miestras que el otro se usara para saber si esta actualmete mostrandose la pantalla del modo debug. Usaremos la tecla \texttt{Y} para activar el modo debug mediante la interrupcion de teclado en el archivo \texttt{isr.asm}. Esta rutina, verificara si aprete dicha tecla y de ser as\'i, se llamara a la fuci\'on \texttt{cambiar\_modo\_debug()}.
+	
+	Esta funci\'on encendera el modo debug si esta apagado y de estar encedido, verificara si se esta mostrando la pantalla de dicho para apagarla, mas no desactiva el modo debug.
+	
+	Por otra parte, en las rutinas de excepciones, antes de ejecutar algun veredicto sobre la tarea que cometio la excepci\'on, checkearemos que el modo debug este encendido. De ser asi, pushearemos todos los registros importantes para poder imprimir los valores pedidos mediante la funci\'on \texttt{mostrar\_pantalla\_debug}. Previamente a esto, activamos la interrupciones nuevamente con \texttt{sti}. Esto ultimo es necesario, para que cuando estemos la funcion previamente mencionada pueda se interrumpida por el teclado el cual como dijimos se encargara de cambiar el estado del modo debug.
+	
+	Una peque\~na cosa a considerar es que al activar las interrupciones, tambien nos va a poder interrupir el reloj, por lo que en dicha rutina, checkearemos que no estemos mostrando la pantalla del modo debug, antes de proseguir con las demas instrucciones.
 \end{enumerate} 
 
 \end{document}
