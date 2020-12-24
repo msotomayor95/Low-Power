@@ -266,11 +266,11 @@ El ejercicio esta dise\~nado para que podamos ver como escribir en memoria utili
  	
  		\item Escribir dos rutinas encargadas de mapear y desmapear páginas de memoria.
  	\begin{enumerate}[label=\Roman{*}-]
- 		\item \texttt{mmu\_mapPage(uint32\_t virtual, uint32\_t cr3, uint32\_t phy)}\\
- 		Permite mapear la página f\'isica correspondiente a phy en la dirección virtual virtual	utilizando cr3.\\
+ 		\item \texttt{mmu\_mapPage(uint32\_t virtual, uint32\_t cr3, uint32\_t phy)}.
  		
- 		Agregamos dos parametros a la funci\'on: \texttt{\uint8\_t rw} y \texttt{\uint8\_t us}
- 		Esta función, implementada en el archivo \texttt{mmu.c}, toma una dirección de memoria virtual,
+ 		Permite mapear la página f\'isica correspondiente a phy en la dirección virtual virtual	utilizando cr3.
+ 		
+ 		Agregamos dos parametros a la funci\'on: \texttt{uint8\_t rw} y \texttt{uint8\_t us}. Esta función, implementada en el archivo \texttt{mmu.c}, toma una dirección de memoria virtual,
  		una de memoria f\'isica, un cr3, rw y us. 
  		
  		Primero revisa que esté el bit de presente en 1 en la
@@ -278,10 +278,11 @@ El ejercicio esta dise\~nado para que podamos ver como escribir en memoria utili
  		caso de no estarlo, la inicializa, utilizando una nueva página libre del area libre del kernel para crear
  		su correspondiente Page Table. 
  		
- 		Luego busca la entrada del Page Table  y la	inicializa, de modo que mapea a la dirección de memoria f\'isica pasada por argumento. Siempre seteando los bits de privilegios y permisos de lectura y escritura de manera acorde a los valores pasados por par\'ametro.\\
+ 		Luego busca la entrada del Page Table  y la	inicializa, de modo que mapea a la dirección de memoria f\'isica pasada por argumento. Siempre seteando los bits de privilegios y permisos de lectura y escritura de manera acorde a los valores pasados por par\'ametro.
  		
- 		\item \texttt{mmu\_unmapPage(uint32\_t cr3, uint32\_t virtual)} \\
- 		Borra el mapeo creado en la dirección virtual virtual utilizando cr3.\\
+ 		\item \texttt{mmu\_unmapPage(uint32\_t cr3, uint32\_t virtual)}
+ 		
+ 		Borra el mapeo creado en la dirección virtual virtual utilizando cr3.
  		
  		Esta otra función, también implementada en el archivo \texttt{mmu.c}, simplemente limpia el bit de presente de la entrada del Page Table, de la correspondiente entrada del Page Directory del cr3 pasado por argumento.
  		
@@ -341,11 +342,12 @@ El ejercicio esta dise\~nado para que podamos ver como escribir en memoria utili
  	Debido a esto separamos la creaci\'on de la tss de una tarea en dos:
  	
  	\begin{itemize}
- 		\item creaci\'on de tss para Rick y Morty: Definimos en la funcion \texttt{tss\_init} los valores tanto para rick como para Morty. Estos se crearan con un nuevo cr3 (con el codigo de las tareas en )
- 		\item creaci\'on de tss para un Mr. Meeseeks: 
+ 		\item creaci\'on de tss para Rick y Morty: Definimos en la funcion \texttt{tss\_init} los valores tanto para rick como para Morty. Estos se crearan con un nuevo cr3 (con el codigo de las tareas mapeado en la direccion virtual 0x1D00000), con la pila en la direccion virtual 0x1D04000 y los selectores de segmento con RPL 3, salvo el ss0 que necesitamos que sea un segmento de datos de nivel 0. 
+ 		
+ 		El con esp empezar\'a en la base de la nueva pagina libre que nos devuelve \texttt{mmu\_next\_free\_kernel\_page()}
+ 		\item creaci\'on de tss para un Mr. Meeseeks: Se explayara mas sobre esto, mas adelante. 
  	\end{itemize}
  
- 	% falta terminar esto. Lo sigo mañana.
  \end{enumerate}
  
 \subsubsection{Ejercicio 7}

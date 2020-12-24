@@ -539,12 +539,7 @@ void mostrar_pantalla_debug(uint32_t gs,
 			}
 		}
 
-	} 
-
-
-	// for (int i = 0; i < 4; ++i) {
-		
-	// }
+	}
 
 	while (modo_debug_corriendo == 1){
 		__asm volatile("nop");
