@@ -392,25 +392,25 @@ El ejercicio esta dise\~nado para que podamos ver como escribir en memoria utili
 \begin{enumerate}
 	\item Inicializar la pantalla del juego, distribuyendo Mega Semillas por el mapa en posiciones aleatorias.
 	
-	Esto lo implementamos en la funci\'on \texttt{sched\_init()}. Utilizamos la funci\'on rand() provista por la c\'atedra para generar numeros aleatorios, a los cuales les tomamos modulo \texttt{80} y \texttt{40} respectivamente para posicionar cada semilla en el mapa. Luego, utilizamos las funciones de \texttt{screen.c} para dibujar estas megasemillas en la pantalla.
+	Esto lo implementamos en la funci\'on \texttt{sched\_init()}. Utilizamos la funci\'on rand() provista por la c\'atedra para generar números aleatorios, a los cuales les tomamos modulo \texttt{80} y \texttt{40} respectivamente para posicionar cada semilla en el mapa. Luego, utilizamos las funciones de \texttt{screen.c} para dibujar estas mega semillas en la pantalla.
 	
 	\item Implementar la l\'ogica de la rutina de interrupciones \texttt{meeseeks (88)} para crear un nuevo Meeseek. Verificar que el mapeo se realice en las direcciones correctas, que funcione la l\'ogica de asimilaci\'on de \textbf{Mega Semillas} y que este est\'e agregado al scheduler. Actualizar el mapa.
 	
-	Para este ejercicio modificamos nuestra funci\'on \texttt{sched\_next\_task()} para agregar la logica de la conmutaci\'on de tareas que contempla a los Mr. Meeseeks vivos. Ahora nuestra variable \texttt{tarea\_actual} sera un numero de 0 a 21. Cuando ya haya pasado el turno tanto de Rick como de Morty, la funci\'on buscar\'a al primer meeseek vivo que encuentre para devolverlo.
+	Para este ejercicio modificamos nuestra funci\'on \texttt{sched\_next\_task()} para agregar la lógica de la conmutaci\'on de tareas que contempla a los Mr. Meeseeks vivos. Ahora nuestra variable \texttt{tarea\_actual} sera un numero de 0 a 21. Cuando ya haya pasado el turno tanto de Rick como de Morty, la funci\'on buscar\'a al primer meeseek vivo que encuentre para devolverlo.
 	
 	En la rutina de interrupci\'on se checkean varias cosas: 
 	
 	\begin{itemize}
 		\item Que la funci\'on solo sea llamada por Rick o Morty. Caso contrario, se mata a la tarea.
-		\item Que los valores pasados por parametro (\texttt{code\_start}, \texttt{x} e \texttt{y}) sean validos, es decir, que el codigo desde donde debemos copiar el codigo del Meeseek este mapeado en la tarea y que tanto x como y no se pasen de 80 ni 40 respectivamente.
-		\item Que todavia haya espacio para crear un nuevo Mr. Meeseek
+		\item Que los valores pasados por parametro (\texttt{code\_start}, \texttt{x} e \texttt{y}) sean validos, es decir, que en la dirección desde donde debemos copiar el código del Meeseek este mapeado en la tarea y que tanto x como y no se pasen de 80 ni 40 respectivamente.
+		\item Que todavía haya espacio para crear un nuevo Mr. Meeseek.
 	\end{itemize}
 	
-	Una vez pasadas estas validaciones, pasamos a crear el mr meeseek con la funci\'on \texttt{crear\_meeseek}. Esta funci\'on checkea que el en las coordenadas creadas no haya una semilla. De haberla, asimilamos la semilla poniendo su flag de encontrada en 1 y sumando 425 puntos al jugador correspondiente para finalmente obviar la crear del meeseek en este caso. De no haber una mega semilla en las coordenadas dadas, buscaremos en nuestro array de meeseeks (recorriendo elementos pares para Rick e impares para Morty) la primera posicion en la que no exista un meeseek. para crearlo con las coordenadas pasadas.
+	Una vez pasadas estas validaciones, pasamos a crear el mr meeseek con la funci\'on \texttt{crear\_meeseek}. Esta funci\'on checkea que en las coordenadas creadas no haya una semilla. De haberla, asimilamos la semilla poniendo su flag de encontrada en 1 y sumando 425 puntos al jugador correspondiente para finalmente obviar la creaci\'on del meeseek. De no haber una mega semilla en las coordenadas dadas, buscaremos en nuestro array de meeseeks (recorriendo elementos pares para Rick e impares para Morty) la primera posición en la que no exista un meeseek. para crearlo con las coordenadas pasadas.
 
-	Finalmente incializaremos la tss del meeseek con la funci\'on \texttt{tss\_task\_init}. Esta funci\'on inicializa el cr3 de la tarea, copiando los 2kb de codigo desde la direcci\'on dada por \texttt{code\_start} y mapearlo en alguna direcci\'on virtual empezando desde 0x8000000 seg\'un corresponda. Luego, setearemos el esp0 en la base de la direccion que nos de la funci\'on \texttt{mmu\_next\_free\_kernel\_page}. Tomamos en cuenta la sugerencia dada por la catedra para reutilizar estas paginas cuando muera un Mr. Meeseek. 
+	Finalmente incializaremos la tss del meeseek con la funci\'on \texttt{tss\_task\_init}. Esta funci\'on inicializa el cr3 de la tarea (asignandole el cr3 del jugador creador), copiando los 2kb de código desde la direcci\'on dada por \texttt{code\_start} y mapeandola en alguna direcci\'on virtual empezando desde 0x8000000 seg\'un corresponda. Luego, setearemos el esp0 en la base de la dirección que nos de la funci\'on \texttt{mmu\_next\_free\_kernel\_page}. Tomamos en cuenta la sugerencia dada por la catedra para reutilizar estas paginas cuando muera un Mr. Meeseek. 
 	
-	Tambien seteamos su ss de nivel 0 para que tenga un selector de segmento de datos con RPL 0, mientras que los demas segmentos sera de datos o codigo segun corresponda y con RPL 3 en todos los casos. Seteamos tambien tanto el ebp como el esp de esta tss para que apunten a la base de la segunda p\'agina mapeada. Activamos las interrupciones poniendo el valor del atribo eflags en 0x202 y por ultimo activamos el bit de presente asociado a esta tss.
+	También seteamos su ss de nivel 0 para que tenga un selector de segmento de datos con RPL 0, mientras que los demas segmentos serán de datos o código según corresponda y con RPL 3 en todos los casos. Seteamos también tanto el ebp como el esp de esta tss para que apunten a la base de la segunda p\'agina mapeada. Activamos las interrupciones poniendo el valor del atributo eflags en 0x202 y por \'ultimo activamos el bit de presente asociado a esta tss.
 	
 	\item Implementar la lógica de la rutina de interrupciones move (123) para mover a un Meeseeks. Verificar que el remapeo y asimilación de semillas se realice de forma correcta. Comenzar implementando sin restricciones de movimiento.
 	
@@ -418,9 +418,9 @@ El ejercicio esta dise\~nado para que podamos ver como escribir en memoria utili
 	
 	En el caso que haya sido llamado por un Mr Meeseek, se llamara a la funci\'on \texttt{mover\_meeseek} con las coordenadas pasadas por parametro.
 	
-	Esta funci\'on calcular\'a la direcci\'on tanto en x como en y nuevas, teniendo en cuenta que el wrap around esta permitido. Se checkear\'a si en estas nuevas coordenadas tenemos una mega semilla para asimilar. De ser asi, despues de asimilarla, se matar al meeseek en cuesti\'on. De no haber una semilla, se pasar\'a a mover el codigo de Mr. Meeseek a la nueva posici\'on del mapa usando la funci\'on \texttt{mover\_codigo\_meeseek}.
+	Esta funci\'on calcular\'a la direcci\'on tanto en x como en y nuevas, teniendo en cuenta que el wrap around esta permitido. Se checkear\'a si en estas nuevas coordenadas tenemos una mega semilla para asimilar. De ser asi, despues de asimilarla, se mata al meeseek en cuesti\'on. De no haber una semilla, se pasar\'a a mover el código de Mr. Meeseek a la nueva posici\'on del mapa usando la funci\'on \texttt{mover\_codigo\_meeseek}.
 	
-	Esta funci\'on calculara la nueva direcci\'on fisica en la que debo correr el meeseek, y mapeara el codigo viejo a esta nueva direccion. Para hacer, mapeamos de manera temporal en el cr3 actual, la direcci\'on fisica previamente mencionada usando identity mapping para copiar el codigo del meeseek, luego desmapeamos la direccion y luego remapeamos la nuevoa direccion fisica a la virtual que teniamos antes, concluyendo as\'i la logica para mover un meeseek.
+	Esta funci\'on calculara la nueva direcci\'on física en la que se debe copiar el meeseek, y mapeara el código viejo a esta nueva dirección. Para hacer esto mapeamos de manera temporal en el cr3 actual, la direcci\'on física previamente mencionada usando identity mapping para copiar el código del meeseek, luego desmapeamos la dirección y luego remapeamos la nueva dirección física a la virtual que teníamos antes, concluyendo as\'i la lógica para mover un meeseek.
 		
 	\item Implementar la lógica de la rutina \texttt{look} (100) para buscar \texttt{Mega Semillas}.
 	
@@ -433,15 +433,15 @@ El ejercicio esta dise\~nado para que podamos ver como escribir en memoria utili
 	
 	\item Implementar la lógica de la rutina \texttt{user\_portal\_gun} (89) para usar el arma de portales.
 	
-	En la rutina, verificamos que la syscall no sea llamada por un jugador. De ser asi, se da por ganador al jugador contrario y se termina el juego de forma inmediata.
+	En la rutina, verificamos que la syscall no sea llamada por un jugador. De ser así, se da por ganador al jugador contrario y se termina el juego de forma inmediata.
 	
-	Tambien verificamos que el meesseek no use mas de una vez el portal gun, debido a la restriccion del trabajo.
+	También verificamos que el meesseek no use m\'as de una vez el portal gun, debido a la restricción del enunciado.
 	
 	Finalmente, si es su primera vez usando el portal gun, usaremos la funci\'on \texttt{rand()}, para generar valores aleatorios y usaremos la funcion move\_meeseek para moverlos con esas coordenadas.
 	
 	\item Agregar restricciones de movimiento a la syscall mover.
 	
-	Agregamos a los meeseeks un atributo que da la distancia m\'axima que pueden recorrer los meeseeks. Empezando todos con 7 cuando se crean. Y tenemos un array de ticks de reloj que contabilizan cuantos ticks llevan. Cuando se crean un meeseeks el tick de reloj correspondiente a este meeseek con 2. Y cada vez que se acaba su tick de reloj, bajamos us distancia m\'axima en 1, hasta un m\'inimo de 1, y restauramos sus ticks de reloj.
+	Agregamos a los meeseeks un atributo que da la distancia m\'axima que pueden recorrer los meeseeks. Empezando todos con 7 cuando se crean. Y tenemos un array de ticks de reloj que contabilizan cuantos ticks llevan. Cuando se crea un meeseeks el tick de reloj correspondiente a este se inicializa con 2. Y cada vez que se acaba su tick de reloj, bajamos su distancia m\'axima en 1, hasta un m\'inimo de 1, luego restauramos sus ticks de reloj.
 	
 	En la syscall move, checkeamos antes de proseguir con el c\'odigo que la distancia que debemos movernos no exceda la distancia m\'axima.
 	
