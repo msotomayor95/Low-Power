@@ -14,11 +14,11 @@
 void mmu_init(void)
 {
 	NEXT_FREE_KERNEL_PAGE = FREE_KERNEL_SPACE;
-	for (int i = 0; i < 10; ++i)
-	{
-		vaddr_rick[i] = 1;
-		vaddr_morty[i] = 1;
-	}
+	// for (int i = 0; i < 10; ++i)
+	// {
+	// 	vaddr_rick[i] = 1;
+	// 	vaddr_morty[i] = 1;
+	// }
 }
 
 paddr_t mmu_next_free_kernel_page(void)
@@ -161,12 +161,12 @@ vaddr_t init_meeseek(uint32_t index, vaddr_t code_start, uint8_t x, uint8_t y)
 	paddr_t map_dir = BASE_MAP + map_offset; // 8 * 1024 = 2 paginas. 80*y*8*1024 + x*8*1024
 	uint32_t i = (uint32_t)index / 2;		 // el indice de meeseeks va de 0 a 19
 
-	if (index % 2 == 0) {
-		vaddr_rick[i] = 0;
-	}
-	else {
-		vaddr_morty[i] = 0;
-	}
+	// if (index % 2 == 0) {
+	// 	vaddr_rick[i] = 0;
+	// }
+	// else {
+	// 	vaddr_morty[i] = 0;
+	// }
 
 	uint32_t cr3 = rcr3();
 	uint32_t free_dir = 0x8000000 + i * 0x2 * 0x1000;
@@ -187,12 +187,12 @@ void mover_codigo_meeseek(uint32_t index, uint8_t x, uint8_t y) {
 	uint32_t map_dir = BASE_MAP + map_offset;
 	uint32_t i = (uint32_t)index / 2;		 // el indice de meeseeks va de 0 a 19
 
-	if (index % 2 == 0) {
-		vaddr_rick[i] = 0;
-	}
-	else {
-		vaddr_morty[i] = 0;
-	}
+	// if (index % 2 == 0) {
+	// 	vaddr_rick[i] = 0;
+	// }
+	// else {
+	// 	vaddr_morty[i] = 0;
+	// }
 
 	uint32_t cr3 = rcr3();
 	mmu_map_page(cr3, map_dir, map_dir, 0x1, 0x1);  // mapeo provisional para copiar el codigo del meeseek
@@ -225,12 +225,13 @@ void kill_meeseek(uint32_t index)
 
 	mmu_unmap_page(cr3, meeseek_start);
 	mmu_unmap_page(cr3, meeseek_start + 0x1000);
-	if (index % 2 == 0)
-	{
-		vaddr_rick[i] = 1;
-	}
-	else
-	{
-		vaddr_morty[i] = 1;
-	}
+	
+	// if (index % 2 == 0)
+	// {
+	// 	vaddr_rick[i] = 1;
+	// }
+	// else
+	// {
+	// 	vaddr_morty[i] = 1;
+	// }
 }
