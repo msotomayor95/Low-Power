@@ -377,13 +377,13 @@ El ejercicio esta dise\~nado para que podamos ver como escribir en memoria utili
 	
 	\item Implementar el mecanismo de debugging explicado en la sección 0.4.4 que indicara en pantalla la razón del desalojo de una tarea. 
 	
-	Para este punto, tendremos dos variables mas llamadas \texttt{modo\_debug} y \texttt{modo\_debug\_corriendo}. El primero se usara para tener un control de si esta activado o no el modo de bug, miestras que el otro se usara para saber si esta actualmete mostrandose la pantalla del modo debug. Usaremos la tecla \texttt{Y} para activar el modo debug mediante la interrupcion de teclado en el archivo \texttt{isr.asm}. Esta rutina, verificara si aprete dicha tecla y de ser as\'i, se llamara a la fuci\'on \texttt{cambiar\_modo\_debug()}.
+	Para este punto, tendremos dos variables m\'as llamadas \texttt{modo\_debug} y \texttt{modo\_debug\_corriendo}. El primero se usara para tener un control de si esta activado o no el modo debug, mientras que el otro se usara para saber si esta actualmete mostrandose la pantalla del modo debug. Usaremos la tecla \texttt{Y} para activar el modo debug mediante la interrupción de teclado en el archivo \texttt{isr.asm}. Esta rutina, verificara si se apreto dicha tecla y de ser as\'i, se llamara a la fuci\'on \texttt{cambiar\_modo\_debug()}.
 	
-	Esta funci\'on encendera el modo debug si esta apagado y de estar encedido, verificara si se esta mostrando la pantalla de dicho para apagarla, mas no desactiva el modo debug.
+	Esta funci\'on encendera el modo debug si esta apagado y de estar encedido, verificara si se esta mostrando la pantalla de debug para apagarla, m\'as no desactiva el modo debug.
 	
-	Por otra parte, en las rutinas de excepciones, antes de ejecutar algun veredicto sobre la tarea que cometio la excepci\'on, checkearemos que el modo debug este encendido. De ser asi, pushearemos todos los registros importantes para poder imprimir los valores pedidos mediante la funci\'on \texttt{mostrar\_pantalla\_debug}. Previamente a esto, activamos la interrupciones nuevamente con \texttt{sti}. Esto ultimo es necesario, para que cuando estemos la funcion previamente mencionada pueda se interrumpida por el teclado el cual como dijimos se encargara de cambiar el estado del modo debug.
+	Por otra parte, en las rutinas de excepciones, antes de ejecutar algún veredicto sobre la tarea que cometió la excepci\'on, verificaremos que el modo debug este encendido. De ser así, pushearemos todos los registros importantes para poder imprimir los valores pedidos mediante la funci\'on \texttt{mostrar\_pantalla\_debug}. Previamente a esto, activamos la interrupciones nuevamente con \texttt{sti}. Esto ultimo es necesario, para que cuando estemos la funcion previamente mencionada pueda se interrumpida por el teclado el cual como dijimos se encargara de cambiar el estado del modo debug.
 	
-	Una peque\~na cosa a considerar es que al activar las interrupciones, tambien nos va a poder interrupir el reloj, por lo que en dicha rutina, checkearemos que no estemos mostrando la pantalla del modo debug, antes de proseguir con las demas instrucciones.
+	Una peque\~na cosa a considerar es que al activar las interrupciones, también nos podra interrupir el reloj, por lo que en dicha rutina, verificaremos que no estemos mostrando la pantalla del modo debug, antes de proseguir con las demas instrucciones.
 \end{enumerate} 
 
 \end{document}
