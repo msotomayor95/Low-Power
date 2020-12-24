@@ -384,7 +384,30 @@ El ejercicio esta dise\~nado para que podamos ver como escribir en memoria utili
 	Por otra parte, en las rutinas de excepciones, antes de ejecutar algún veredicto sobre la tarea que cometió la excepci\'on, verificaremos que el modo debug este encendido. De ser así, pushearemos todos los registros importantes para poder imprimir los valores pedidos mediante la funci\'on \texttt{mostrar\_pantalla\_debug}. Previamente a esto, activamos la interrupciones nuevamente con \texttt{sti}. Esto ultimo es necesario, para que cuando estemos la funcion previamente mencionada pueda se interrumpida por el teclado el cual como dijimos se encargara de cambiar el estado del modo debug.
 	
 	Una peque\~na cosa a considerar es que al activar las interrupciones, también nos podra interrupir el reloj, por lo que en dicha rutina, verificaremos que no estemos mostrando la pantalla del modo debug, antes de proseguir con las demas instrucciones.
+
 \end{enumerate} 
+
+\subsubsection{Ejercicio 8}
+
+\begin{enumerate}
+	\item Inicializar la pantalla del juego, distribuyendo Mega Semillas por el mapa en posiciones aleatorias.
+	
+	Esto lo implementamos en la funci\'on \texttt{sched\_init()}. Utilizamos la funci\'on rand() provista por la c\'atedra para generar numeros aleatorios, a los cuales les tomamos modulo \texttt{80} y \texttt{40} respectivamente para posicionar cada semilla en el mapa. Luego, utilizamos las funciones de \texttt{screen.c} para dibujar estas megasemillas en la pantalla.
+	
+	\item Implementar la l\'ogica de la rutina de interrupciones \texttt{meeseeks (88)} para crear un nuevo Meeseek. Verificar que el mapeo se realice en las direcciones correctas, que funcione la l\'ogica de asimilaci\'on de \textbf{Mega Semillas} y que este est\'e agregado al scheduler. Actualizar el mapa.
+	
+	Para este ejercicio modificamos nuestra funci\'on \texttt{sched\_next\_task()} para agregar la logica de la conmutaci\'on de tareas que contempla a los Mr. Meeseeks vivos. Ahora nuestra variable \texttt{tarea\_actual} sera un numero de 0 a 21. Cuando ya haya pasado el turno tanto de Rick como de Morty, la funci\'on buscar\'a al primer meeseek vivo que encuentre para devolverlo.
+	
+	En la rutina de interrupci\'on se checkean varias cosas: 
+	
+	\begin{itemize}
+		\item Que la funci\'on solo sea llamada por Rick o Morty. Caso contrario, se mata a la tarea.
+		\item Que los valores pasados por parametro (\texttt{code\_start}, \texttt{x} e \texttt{y}) sean validos, es decir, que el codigo desde donde debemos copiar el codigo del Meeseek este mapeado en la tarea y que tanto x como y no se pasen de 80 ni 40 respectivamente.
+		\item Que todavia haya espacio para crear un nuevo Mr. Meeseek
+	\end{itemize}
+	
+	Agregamos una funci\'on nueva a nuestro scheduler llamada \texttt{crear\_meeseek}
+\end{enumerate}
 
 \end{document}
 
